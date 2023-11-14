@@ -17,7 +17,7 @@ public class Main {
             double delta = updateTime / (double) OPTIMAL_TIME;
 
             window.update(delta);
-            window.render();
+            window.render(true);
         }
     }
 }

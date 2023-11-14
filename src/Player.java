@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Player extends Entity {
     private Map m;
@@ -12,17 +13,32 @@ public class Player extends Entity {
         this.m = m;
     }
 
+    private ArrayList<Vector2> collisions;
+
     @Override
     public void draw(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
         g.setColor(Color.YELLOW);
-        g.drawOval(getX(), getY(), getWidth(), getHeight());
+        g.drawRect(getX(), getY(), getWidth(), getHeight());
+
+        Stroke old = g2.getStroke();
+//        for (Vector2 e : collisions) {
+//            g2.setStroke(new BasicStroke(2));
+//            g2.setColor(Color.GREEN);
+//            g2.fillRect((int) e.x, (int) e.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
+//        }
+//        g2.setStroke(old);
     }
 
     @Override
     public void update(double deltaT) {
-        Vector2 newPos = getPos().copy().add(getDirection().copy().multiply(0.8 * deltaT));
-        if (m.collides(newPos, 'W').isEmpty()) {
-            setPos(newPos);
-        }
+
+//        Vector2 newPos = getPos().copy().add(getDirection().copy().multiply(0.8 * deltaT));
+//        m.getPossibleDirections(getPos());
+//        collisions = m.collides(newPos, 'W');
+//        if (collisions.isEmpty()) {
+//            setPos(newPos);
+//        } else {
+//        }
     }
 }
