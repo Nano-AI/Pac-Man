@@ -32,30 +32,38 @@ public class Map {
         return points[x][y];
     }
 
-    private boolean collides(Vector2 p1, Vector2 p2, boolean iterate) {
-        int width = pixelPerHorizontalGrid;
-        int height = pixelPerVerticalGrid;
-        // top intersections
-        return p1.x > p2.x && p1.x < p2.x + width && p1.y > p2.y && p1.y < p2.y + height;
-    }
+//    public ArrayList<Vector2> collides(Vector2 pos, Vector2 type) {
+//        ArrayList<Vector2> entities = new ArrayList<>();
+//        for (int i = 0; i < grid.length; i++) {
+//            for (int j = 0; j < grid[i].length; j++) {
+//                char at = grid[i][j];
+//                Vector2 point = points[i][j];
+//                if (at == type && collides(point, pos)) {
+//                    entities.add(point);
+//                }
+//            }
+//        }
+//        return entities;
+//    }
 
-    public boolean collides(Vector2 p1, Vector2 p2) {
-        return collides(p1, p2, true) || collides(p2, p1, true);
-    }
-
-    public ArrayList<Vector2> collides(Vector2 pos, char type) {
-        ArrayList<Vector2> entities = new ArrayList<>();
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                char at = grid[i][j];
-                Vector2 point = points[i][j];
-                if (at == type && collides(point, pos)) {
-                    entities.add(point);
-                }
-            }
-        }
-        return entities;
-    }
+//    public ArrayList<Vector2> getPossibleDirections(Vector2 pos) {
+//        ArrayList<Vector2> values = new ArrayList<>();
+//        char[] possibleDirections = new char[]{'u', 'd', 'l', 'r'};
+//
+//        Vector2 size = new Vector2(pixelPerHorizontalGrid, pixelPerVerticalGrid);
+//
+//        for (char d : possibleDirections) {
+//            Vector2 dV = Utils.getDirection(d);
+//            Vector2 newPos = dV.multiply(size).add(pos);
+//            if (!collides(newPos, pos)) {
+//                values.add(newPos);
+//            }
+//        }
+//
+//        System.out.println(values);
+//
+//        return values;
+//    }
 
     @Override
     public String toString() {
