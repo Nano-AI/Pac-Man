@@ -56,8 +56,9 @@ public class Window extends JFrame implements KeyListener {
         );
 
 
-//        Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid * 7 / 8, pixelPerVerticalGrid * 7 / 8);
+        // make it one pixel smaller than the grid so it can squeeze through the walls
         Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+//        Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         playerRect.pad(player.getWidth(), player.getHeight());
         player.setHitbox(playerRect);
         player.setMap(map);
@@ -169,10 +170,10 @@ public class Window extends JFrame implements KeyListener {
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
         switch (key) {
-            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> player.setDirection('e');
-            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> player.setDirection('w');
-            case KeyEvent.VK_UP , KeyEvent.VK_W-> player.setDirection('n');
-            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> player.setDirection('s');
+            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> player.setWantedDirection('e');
+            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> player.setWantedDirection('w');
+            case KeyEvent.VK_UP , KeyEvent.VK_W-> player.setWantedDirection('n');
+            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> player.setWantedDirection('s');
             default -> {
             }
         }

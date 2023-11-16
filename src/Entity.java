@@ -29,7 +29,7 @@ public class Entity {
     public boolean isIn(Entity e) {
         Rect d1 = hitbox.copy().displace(this.pos);
         Rect d2 = e.hitbox.copy().displace(e.pos);
-        return d1.inside(d2);
+        return d1.isIn(d2);
     }
 
     public Vector2 getHitboxCenter() {
@@ -58,7 +58,7 @@ public class Entity {
         return (int) this.pos.y;
     }
 
-    public Vector2 getPos() {
+        public Vector2 getPos() {
         return this.pos;
     }
 

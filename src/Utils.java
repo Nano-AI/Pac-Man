@@ -16,7 +16,7 @@ public class Utils {
     }
 
     public static boolean inside(double value, double min, double max) {
-        return value > min && value < max;
+        return (value > min) && (value < max);
     }
 
     public static char getDirection(Vector2 d) {

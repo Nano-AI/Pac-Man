@@ -3,6 +3,8 @@ import java.sql.Array;
 import java.util.ArrayList;
 
 public class Player extends Entity {
+    private Vector2 prevDirection;
+    private Vector2 wantedDirection;
     private Map m;
     private Vector2 nextPos;
 
@@ -13,6 +15,7 @@ public class Player extends Entity {
         walls = new ArrayList<>();
         collisions = new ArrayList<>();
         setDirection('0');
+        wantedDirection = getDirection();
     }
 
     public void setMap(Map m) {
@@ -39,34 +42,51 @@ public class Player extends Entity {
 
     @Override
     public void update(double deltaT) {
-        Vector2 check = getPos().copy().add(getDirection().copy().multiply(0.8 * deltaT));
-        Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
-        c.hitbox = hitbox.copy();
+        boolean newPath = nextIsBlocked(wantedDirection, deltaT);
+        boolean samePath = nextIsBlocked(getDirection(), deltaT);
+        if (!newPath) {
+//            System.out.println("Wanted direction is NOT blocked!" + wantedDirection);
+            goTowards(wantedDirection, deltaT);
+        } else if (!samePath) {
+//            System.out.println("Current direction is NOT blocked!");
+            goTowards(getDirection(), deltaT);
+        }
+    }
 
+    private void goTowards(Vector2 direction, double deltaT) {
+        prevDirection = getDirection().copy();
+        setDirection(direction);
+        setPos(getNextPos(direction, deltaT));
+    }
+
+    private boolean nextIsBlocked(Vector2 direction, double deltaT) {
         this.collisions.clear();
+        Entity c = getNextPosEntity(direction, deltaT);
         boolean blocked = false;
 
         for (Entity wall : walls) {
-            if (c.isIn(wall) && c.isTouching(wall)) {
+            if (c.isIn(wall)) {
+                this.collisions.add(wall);
                 blocked = true;
                 break;
             }
         }
 
-        if (!blocked) {
-            setPos(check);
-        } else {
-            nextPos = getPos();
-        }
+        return blocked;
     }
 
-    public char[] getPossibleDirections() {
-        char[] pos = Utils.cardinalDirections;
+    private Entity getNextPosEntity(Vector2 direction, double deltaT) {
+        Vector2 check = getNextPos(direction, deltaT);
+        Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
+        c.hitbox = hitbox.copy();
+        return c;
+    }
 
-        int i = 0;
-        for (Entity wall : collisions) {
+    private Vector2 getNextPos(Vector2 direction, double deltaT) {
+        return  getPos().copy().add(direction.copy().multiply(1.5 * deltaT));
+    }
 
-        }
-        return pos;
+    public void setWantedDirection(char direction) {
+        wantedDirection = Utils.getDirection(direction);
     }
 }

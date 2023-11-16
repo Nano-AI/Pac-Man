@@ -26,12 +26,13 @@ public class Rect {
         return xOverlap && yOverlap;
     }
 
-    public boolean inside(Rect r) {
-        boolean xOverlap = Utils.inside(getX(), r.getX(), r.getX() + r.getWidth()) ||
-                Utils.inside(r.getX(), getX(), getX() + getWidth());
-        boolean yOverlap = Utils.inside(getY(), r.getY(), r.getY() + r.getHeight()) ||
-                Utils.inside(r.getY(), getY(), getY() + getHeight());
-        return xOverlap && yOverlap;
+    public boolean isIn(Rect r) {
+        Vector2 topLeft = pos.copy();
+        Vector2 topRight = pos.copy().add(new Vector2(getWidth(), 0));
+        Vector2 bottomLeft = pos.copy().add(new Vector2(0, getHeight()));
+        Vector2 bottomRight = pos.copy().add(getSize());
+
+        Vector2
     }
 
     public Rect copy() {
