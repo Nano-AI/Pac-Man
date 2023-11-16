@@ -58,6 +58,11 @@ public class Vector2 {
         return x == v.x && y == v.y;
     }
 
+    public boolean isIn(Entity e) {
+        Rect r = new Rect(e.getPos().copy().add(e.hitbox.pos), e.hitbox.size);
+        return Utils.inRange(x, r.getX(), r.getX() + r.getWidth()) && Utils.inRange(y, r.getY(), r.getY() + r.getHeight());
+    }
+
     @Override
     public String toString() {
         return String.format("{x=%.2f, y=%.2f}", x, y);

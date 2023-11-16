@@ -12,6 +12,11 @@ public class Rect {
         this.size = new Vector2(width, height);
     }
 
+    public void pad(int width, int height) {
+        this.pos.x = (width - this.size.x) / 2;
+        this.pos.y = (height - this.size.y) / 2;
+    }
+
     public boolean collides(Rect r) {
         // top intersections
         boolean xOverlap = Utils.inRange(getX(), r.getX(), r.getX() + r.getWidth()) ||
@@ -19,6 +24,23 @@ public class Rect {
         boolean yOverlap = Utils.inRange(getY(), r.getY(), r.getY() + r.getHeight()) ||
                 Utils.inRange(r.getY(), getY(), getY() + getHeight());
         return xOverlap && yOverlap;
+    }
+
+    public boolean inside(Rect r) {
+        boolean xOverlap = Utils.inside(getX(), r.getX(), r.getX() + r.getWidth()) ||
+                Utils.inside(r.getX(), getX(), getX() + getWidth());
+        boolean yOverlap = Utils.inside(getY(), r.getY(), r.getY() + r.getHeight()) ||
+                Utils.inside(r.getY(), getY(), getY() + getHeight());
+        return xOverlap && yOverlap;
+    }
+
+    public Rect copy() {
+        return new Rect(getX(), getY(), getWidth(), getHeight());
+    }
+
+    public Rect displace(Vector2 offset) {
+        pos.add(offset);
+        return this;
     }
 
     public void moveX(int x) {
@@ -43,5 +65,9 @@ public class Rect {
 
     public int getHeight() {
         return (int) this.size.y;
+    }
+
+    public Vector2 getSize() {
+        return this.size;
     }
 }

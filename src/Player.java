@@ -1,11 +1,17 @@
 import java.awt.*;
+import java.sql.Array;
 import java.util.ArrayList;
 
 public class Player extends Entity {
     private Map m;
-    private Vector2 prevDirection;
+    private Vector2 nextPos;
+
+    private ArrayList<Entity> collisions;
+    private ArrayList<Entity> walls;
     public Player(int x, int y, int width, int height) {
         super(x, y, width, height);
+        walls = new ArrayList<>();
+        collisions = new ArrayList<>();
         setDirection('0');
     }
 
@@ -13,32 +19,54 @@ public class Player extends Entity {
         this.m = m;
     }
 
-    private ArrayList<Vector2> collisions;
+    public void setWalls(ArrayList<Entity> walls) {
+        this.walls = walls;
+    }
 
     @Override
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g.setColor(Color.YELLOW);
-        g.drawRect(getX(), getY(), getWidth(), getHeight());
+        g.fillOval(getX(), getY(), getWidth(), getHeight());
 
-        Stroke old = g2.getStroke();
-//        for (Vector2 e : collisions) {
-//            g2.setStroke(new BasicStroke(2));
-//            g2.setColor(Color.GREEN);
-//            g2.fillRect((int) e.x, (int) e.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
-//        }
-//        g2.setStroke(old);
+        for (Entity c : collisions) {
+            g.setColor(Color.RED);
+            g.drawLine(getX() + (getWidth() / 2), getY() + (getHeight() / 2), c.getX() + (c.getWidth() / 2), c.getY() + (c.getHeight() / 2));
+        }
+
+        g.drawRect((int) nextPos.x, (int) nextPos.y, 10, 10);
     }
 
     @Override
     public void update(double deltaT) {
+        Vector2 check = getPos().copy().add(getDirection().copy().multiply(0.8 * deltaT));
+        Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
+        c.hitbox = hitbox.copy();
 
-//        Vector2 newPos = getPos().copy().add(getDirection().copy().multiply(0.8 * deltaT));
-//        m.getPossibleDirections(getPos());
-//        collisions = m.collides(newPos, 'W');
-//        if (collisions.isEmpty()) {
-//            setPos(newPos);
-//        } else {
-//        }
+        this.collisions.clear();
+        boolean blocked = false;
+
+        for (Entity wall : walls) {
+            if (c.isIn(wall)) {
+                blocked = true;
+                break;
+            }
+        }
+
+        if (!blocked) {
+            setPos(check);
+        } else {
+            nextPos = getPos();
+        }
+    }
+
+    public char[] getPossibleDirections() {
+        char[] pos = Utils.cardinalDirections;
+
+        int i = 0;
+        for (Entity wall : collisions) {
+
+        }
+        return pos;
     }
 }

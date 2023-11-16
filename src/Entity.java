@@ -21,7 +21,27 @@ public class Entity {
     }
 
     public boolean isTouching(Entity e) {
-        return hitbox.collides(e.hitbox);
+        Rect d1 = hitbox.copy().displace(this.pos);
+        Rect d2 = e.hitbox.copy().displace(e.pos);
+        return d1.collides(d2);
+    }
+
+    public boolean isIn(Entity e) {
+        Rect d1 = hitbox.copy().displace(this.pos);
+        Rect d2 = e.hitbox.copy().displace(e.pos);
+        return d1.inside(d2);
+    }
+
+    public Vector2 getHitboxCenter() {
+        return getCenter(hitbox.pos, hitbox.size);
+    }
+
+    public Vector2 getCenter() {
+        return getCenter(getPos(), getSize());
+    }
+
+    private Vector2 getCenter(Vector2 pos, Vector2 size) {
+        return getPos().copy().add(getSize().copy().multiply(0.5));
     }
 
     public Entity(int x, int y, int width, int height) {
@@ -44,7 +64,6 @@ public class Entity {
 
     public void setPos(Vector2 pos) {
         this.pos = pos;
-        this.hitbox.pos = pos;
     }
 
     public void setGridSize(Vector2 size) {
@@ -68,6 +87,10 @@ public class Entity {
 
     public int getHeight() {
         return this.height;
+    }
+
+    public Vector2 getSize() {
+        return new Vector2(this.width, this.height);
     }
 
     public void update(double deltaT) {
