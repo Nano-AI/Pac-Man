@@ -34,7 +34,7 @@ public class Player extends Entity {
             g.drawLine(getX() + (getWidth() / 2), getY() + (getHeight() / 2), c.getX() + (c.getWidth() / 2), c.getY() + (c.getHeight() / 2));
         }
 
-        g.drawRect((int) nextPos.x, (int) nextPos.y, 10, 10);
+        g.drawRect(getX(), getY(), 10, 10);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class Player extends Entity {
         boolean blocked = false;
 
         for (Entity wall : walls) {
-            if (c.isIn(wall)) {
+            if (c.isIn(wall) && c.isTouching(wall)) {
                 blocked = true;
                 break;
             }
