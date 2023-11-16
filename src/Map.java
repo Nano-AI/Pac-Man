@@ -6,6 +6,7 @@ public class Map {
     public final int width, height;
 
     private Vector2[][] points;
+    private Vector2[][] pixelPoints;
 
     public int pixelPerHorizontalGrid, pixelPerVerticalGrid;
     public Map(int width, int height) {
@@ -14,9 +15,17 @@ public class Map {
 
         this.grid = new char[height][width];
         this.points = new Vector2[height][width];
+        this.pixelPoints = new Vector2[height][width];
+    }
+
+    public char at(Vector2 v) {
+        return at((int) v.x, (int) v.y);
     }
 
     public char at(int x, int y) {
+        if (x > height || x < 0 || y > width || y < 0) {
+            return ' ';
+        }
         return grid[x][y];
     }
 
@@ -31,8 +40,7 @@ public class Map {
     public Vector2 getPoint(int x, int y) {
         return points[x][y];
     }
-
-//    public ArrayList<Vector2> collides(Vector2 pos, Vector2 type) {
+    //    public ArrayList<Vector2> collides(Vector2 pos, Vector2 type) {
 //        ArrayList<Vector2> entities = new ArrayList<>();
 //        for (int i = 0; i < grid.length; i++) {
 //            for (int j = 0; j < grid[i].length; j++) {

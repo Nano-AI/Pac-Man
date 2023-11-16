@@ -63,6 +63,7 @@ public class Window extends JFrame implements KeyListener {
         player.setHitbox(playerRect);
         player.setMap(map);
         player.setWalls(walls);
+        player.setGridPos(spawn);
         entities.add(player);
 
 
@@ -157,6 +158,7 @@ public class Window extends JFrame implements KeyListener {
                     food.add(f);
                 }
                 map.setPoint(new Vector2(xPos, yPos), j, i);
+//                map.setPixelPoint(j, i, new Vector2(xPos, yPos));
             }
         }
     }

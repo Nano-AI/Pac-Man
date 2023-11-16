@@ -6,6 +6,7 @@ public class Entity {
     private Vector2 grid;
     private int width, height;
     private Vector2 direction;
+    private Vector2 gridPos;
     private Vector2 gridSize;
 
     public Rect hitbox;
@@ -24,6 +25,14 @@ public class Entity {
         Rect d1 = hitbox.copy().displace(this.pos);
         Rect d2 = e.hitbox.copy().displace(e.pos);
         return d1.collides(d2);
+    }
+
+    public void setGridPos(Vector2 pos) {
+        this.gridPos = pos;
+    }
+
+    public Vector2 getGridPos() {
+        return this.gridPos.copy();
     }
 
     public boolean isIn(Entity e) {
@@ -71,7 +80,7 @@ public class Entity {
     }
 
     public Vector2 getDirection() {
-        return direction;
+        return direction.copy();
     }
     public void setDirection(char d) {
         direction = Utils.getDirection(d);
