@@ -19,6 +19,10 @@ public class Utils {
         return (value > min) && (value < max);
     }
 
+    public static boolean withinRange(double value, double equal, double percent) {
+        return value * (1 - percent) <= equal && value * (1 + percent) >= equal;
+    }
+
     public static char getDirection(Vector2 d) {
         if (d.equals(getDirection('n'))) {
             return 'n';

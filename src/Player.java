@@ -42,13 +42,14 @@ public class Player extends Entity {
 
     @Override
     public void update(double deltaT) {
+        // TODO: update it so we keep track of possible moves through the grid instead of using hitboxes and collisions
         boolean newPath = nextIsBlocked(wantedDirection, deltaT);
         boolean samePath = nextIsBlocked(getDirection(), deltaT);
         if (!newPath) {
-//            System.out.println("Wanted direction is NOT blocked!" + wantedDirection);
+            System.out.println("Wanted direction is NOT blocked!" + wantedDirection);
             goTowards(wantedDirection, deltaT);
         } else if (!samePath) {
-//            System.out.println("Current direction is NOT blocked!");
+            System.out.println("Current direction is NOT blocked!");
             goTowards(getDirection(), deltaT);
         }
     }
@@ -56,6 +57,7 @@ public class Player extends Entity {
     private void goTowards(Vector2 direction, double deltaT) {
         prevDirection = getDirection().copy();
         setDirection(direction);
+        System.out.println(getNextPos(direction, deltaT));
         setPos(getNextPos(direction, deltaT));
     }
 
@@ -83,7 +85,7 @@ public class Player extends Entity {
     }
 
     private Vector2 getNextPos(Vector2 direction, double deltaT) {
-        return  getPos().copy().add(direction.copy().multiply(1.5 * deltaT));
+        return getPos().copy().add(direction.copy().multiply(1.5 * deltaT));
     }
 
     public void setWantedDirection(char direction) {

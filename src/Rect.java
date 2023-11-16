@@ -32,7 +32,12 @@ public class Rect {
         Vector2 bottomLeft = pos.copy().add(new Vector2(0, getHeight()));
         Vector2 bottomRight = pos.copy().add(getSize());
 
-        Vector2
+        Vector2 rtopLeft = r.pos.copy();
+        Vector2 rtopRight = r.pos.copy().add(new Vector2(getWidth(), 0));
+        Vector2 rbottomLeft = r.pos.copy().add(new Vector2(0, getHeight()));
+        Vector2 rbottomRight = r.pos.copy().add(getSize());
+
+        return topRight.x > rtopLeft.x && topLeft.x < rtopRight.x && bottomRight.y > rtopLeft.y && topLeft.y < rbottomRight.y;
     }
 
     public Rect copy() {
