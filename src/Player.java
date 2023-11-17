@@ -1,4 +1,7 @@
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.sql.Array;
 import java.util.ArrayList;
 
@@ -11,6 +14,7 @@ public class Player extends Entity {
     private ArrayList<Entity> collisions;
     private ArrayList<Entity> walls;
     private Vector2 nextGridPos;
+    private double deltaAnimate = 0;
 
     public Player(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -32,19 +36,36 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        g.setColor(Color.YELLOW);
-        g.fillOval(getX(), getY(), getWidth(), getHeight());
+//        g2.drawImage(getImage(), getX(), getY(), getWidth(), getHeight(), null);
+        drawImage(g);
+    }
 
-        for (Entity c : collisions) {
-            g.setColor(Color.RED);
-            g.drawLine(getX() + (getWidth() / 2), getY() + (getHeight() / 2), c.getX() + (c.getWidth() / 2), c.getY() + (c.getHeight() / 2));
-        }
+    public void drawImage(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+        Vector2 p = getPos();
+        Vector2 size = getSize();
+        Vector2 center = getCenter();
+        BufferedImage img = getImage();
+//        tr.scale(size.x, size.y);
+        int rotation = switch (Utils.getDirection(getDirection())) {
+            case 'n' -> 90;
+            case 'e' -> 180;
+            case 's' -> 270;
+            case 'w' -> 0;
+            default -> 0;
+        };
 
-        g.drawRect(getX(), getY(), 10, 10);
+        AffineTransform backup = g2.getTransform();
+        AffineTransform a = AffineTransform.getRotateInstance(Math.toRadians(rotation), center.x, center.y);
+
+        g2.setTransform(a);
+        g2.drawImage(img, (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
+        g2.setTransform(backup);
     }
 
     @Override
     public void update(double deltaT) {
+        deltaAnimate += deltaT;
 //         TODO: update it so we keep track of possible moves through the grid instead of using hitboxes and collisions
         boolean newPath = nextIsBlocked(wantedDirection, deltaT);
         boolean samePath = nextIsBlocked(getDirection(), deltaT);
@@ -60,6 +81,11 @@ public class Player extends Entity {
             if (!temp.equals(getDirection())) {
                 prevDirection = temp;
             }
+        }
+
+        if (deltaAnimate >= 5) {
+            incrementFrameIndex();
+            deltaAnimate = 0;
         }
     }
 

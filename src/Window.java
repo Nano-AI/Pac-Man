@@ -64,7 +64,12 @@ public class Window extends JFrame implements KeyListener {
         player.setMap(map);
         player.setWalls(walls);
         player.setGridPos(spawn);
+        player.setupImages("./img/pacman");
         entities.add(player);
+
+        for (Entity f : food) {
+            ((Food) f).player = player;
+        }
 
 
         for (Entity e : entities) {
@@ -153,8 +158,9 @@ public class Window extends JFrame implements KeyListener {
                     int foodHeight = pixelPerVerticalGrid / 4;
                     int foodXOffset = (pixelPerHorizontalGrid - foodWidth) / 2;
                     int foodYOffset = (pixelPerVerticalGrid - foodHeight) / 2;
-                    Food f = new Food(foodXOffset + xPos, foodYOffset + yPos, pixelPerHorizontalGrid / 4, pixelPerVerticalGrid / 4);
-                    f.setHitbox(new Rect(0, 0, foodWidth * 3 / 4, foodHeight * 3 / 4));
+                    Food f = new Food(foodXOffset + xPos, foodYOffset + yPos,
+                            foodWidth, foodHeight);
+                    f.setHitbox(new Rect(0, 0, foodWidth, foodHeight));
                     food.add(f);
                 }
                 map.setPoint(new Vector2(xPos, yPos), j, i);

@@ -1,5 +1,8 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class Entity {
@@ -11,29 +14,37 @@ public class Entity {
     private Vector2 gridPos;
     private Vector2 gridSize;
 
-    private ArrayList<BufferedImage> images;
+    private BufferedImage[] images;
 
     public Rect hitbox;
 
     private int frameIndex = 0;
 
-    public void setupImages(String folder) {
-//        for (int i = 0; i < )
-    }
 
-    public ArrayList<BufferedImage> getImages() {
+    public BufferedImage[] getImages() {
         return this.images;
     }
 
     public BufferedImage getImage(int index) {
-        return this.images.get(index);
+        return this.images[index];
     }
 
-    public void incrementFrameIndex() {
+
+    public BufferedImage getImage() {
+        return this.images[frameIndex];
+    }
+
+    public BufferedImage incrementFrameIndex() {
+        BufferedImage prev = getImage(frameIndex);
         frameIndex++;
-        if (frameIndex >= images.size()) {
+        if (frameIndex >= images.length) {
             frameIndex = 0;
         }
+        return prev;
+    }
+
+    public void setupImages(String path) {
+        this.images = Utils.getImages(path);
     }
 
     public Entity(int x, int y, int gridX, int gridY, int width, int height) {
@@ -93,7 +104,7 @@ public class Entity {
     }
 
         public Vector2 getPos() {
-        return this.pos;
+        return this.pos.copy();
     }
 
     public void setPos(Vector2 pos) {

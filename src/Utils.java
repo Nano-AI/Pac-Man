@@ -1,4 +1,11 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Utils {
     public static char[] cardinalDirections = new char[]{'n', 'e', 's', 'w'};
@@ -53,4 +60,30 @@ public class Utils {
         return new Vector2(x, y);
     }
 
+    public static BufferedImage[] getImages(String folder) {
+        File dir = new File(folder);
+        File[] listing = dir.listFiles();
+
+        assert listing != null;
+        BufferedImage[] o = new BufferedImage[listing.length];
+
+        for (File child : listing) {
+            String name = child.getName();
+            int fileIndex;
+            try {
+                fileIndex = Integer.parseInt(name.substring(0, name.lastIndexOf(".")));
+            } catch (NumberFormatException e) {
+                System.out.println("The given directory has an invalid file name: " + name);
+                continue;
+            }
+
+            try {
+                o[fileIndex] = ImageIO.read(child);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return o;
+    }
 }
