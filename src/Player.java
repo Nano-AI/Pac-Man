@@ -49,7 +49,6 @@ public class Player extends Entity {
         boolean newPath = nextIsBlocked(wantedDirection, deltaT);
         boolean samePath = nextIsBlocked(getDirection(), deltaT);
         if (!newPath) {
-//            System.out.println("Wanted direction is NOT blocked!" + wantedDirection);
             Vector2 temp = getDirection();
             goTowards(wantedDirection, deltaT);
             if (!temp.equals(getDirection())) {
@@ -57,7 +56,6 @@ public class Player extends Entity {
             }
         } else if (!samePath) {
             Vector2 temp = getDirection();
-//            System.out.println("Current direction is NOT blocked!");
             goTowards(getDirection(), deltaT);
             if (!temp.equals(getDirection())) {
                 prevDirection = temp;
@@ -68,12 +66,13 @@ public class Player extends Entity {
     private void goTowards(Vector2 direction, double deltaT) {
         prevDirection = getDirection().copy();
         setDirection(direction);
-        setPos(getNextPos(direction, deltaT));
+        setPos(getNextPos(1.8, direction, deltaT));
     }
 
     private boolean nextIsBlocked(Vector2 direction, double deltaT) {
         this.collisions.clear();
-        Entity c = getNextPosEntity(direction, deltaT);
+        // I HAVE NO CLUE WHY GETTING SIZE AND DIVIDING BY 16 WORKS, BUT HEY, IT DOES!
+        Entity c = getNextPosEntity((int) (getSize().x / 16), direction, 1);
         boolean blocked = false;
 
         for (Entity wall : walls) {
@@ -87,15 +86,15 @@ public class Player extends Entity {
         return blocked;
     }
 
-    private Entity getNextPosEntity(Vector2 direction, double deltaT) {
-        Vector2 check = getNextPos(direction, deltaT);
+    private Entity getNextPosEntity(double distance, Vector2 direction, double deltaT) {
+        Vector2 check = getNextPos(distance, direction, deltaT);
         Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
         c.hitbox = hitbox.copy();
         return c;
     }
 
-    private Vector2 getNextPos(Vector2 direction, double deltaT) {
-        return getPos().copy().add(direction.copy().multiply(1.5 * deltaT));
+    private Vector2 getNextPos(double distance, Vector2 direction, double deltaT) {
+        return getPos().copy().add(direction.copy().multiply(distance * deltaT));
     }
 
     public void setWantedDirection(char direction) {

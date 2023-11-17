@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Entity {
     private Vector2 pos;
@@ -9,7 +11,30 @@ public class Entity {
     private Vector2 gridPos;
     private Vector2 gridSize;
 
+    private ArrayList<BufferedImage> images;
+
     public Rect hitbox;
+
+    private int frameIndex = 0;
+
+    public void setupImages(String folder) {
+//        for (int i = 0; i < )
+    }
+
+    public ArrayList<BufferedImage> getImages() {
+        return this.images;
+    }
+
+    public BufferedImage getImage(int index) {
+        return this.images.get(index);
+    }
+
+    public void incrementFrameIndex() {
+        frameIndex++;
+        if (frameIndex >= images.size()) {
+            frameIndex = 0;
+        }
+    }
 
     public Entity(int x, int y, int gridX, int gridY, int width, int height) {
         this.pos = new Vector2(x, y);
