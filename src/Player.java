@@ -15,6 +15,7 @@ public class Player extends Entity {
     private ArrayList<Entity> walls;
     private Vector2 nextGridPos;
     private double deltaAnimate = 0;
+    private boolean blocked = false;
 
     public Player(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -69,21 +70,24 @@ public class Player extends Entity {
 //         TODO: update it so we keep track of possible moves through the grid instead of using hitboxes and collisions
         boolean newPath = nextIsBlocked(wantedDirection, deltaT);
         boolean samePath = nextIsBlocked(getDirection(), deltaT);
+        blocked = true;
         if (!newPath) {
             Vector2 temp = getDirection();
             goTowards(wantedDirection, deltaT);
             if (!temp.equals(getDirection())) {
                 prevDirection = temp;
             }
+            blocked = false;
         } else if (!samePath) {
             Vector2 temp = getDirection();
             goTowards(getDirection(), deltaT);
             if (!temp.equals(getDirection())) {
                 prevDirection = temp;
             }
+            blocked = false;
         }
 
-        if (deltaAnimate >= 5) {
+        if (deltaAnimate >= 5 && !blocked) {
             incrementFrameIndex();
             deltaAnimate = 0;
         }
