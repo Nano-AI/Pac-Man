@@ -1,5 +1,3 @@
-import com.sun.source.doctree.HiddenTree;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,11 +15,16 @@ public class Window extends JFrame implements KeyListener {
     private double deltaT;
     private Image bufferImage;
     private Graphics2D buffer;
+    private int fps;
+    private StatsCounter statsCounter;
+
     public Window(String title, Map m) {
         super(title);
         this.map = m;
         entities = new ArrayList<>();
         food = new ArrayList<>();
+
+        setTitle(title);
 
         display();
         setupPoints();
@@ -33,7 +36,10 @@ public class Window extends JFrame implements KeyListener {
         addKeyListener(this);
     }
 
+
     private void setupEntities() {
+        statsCounter = new StatsCounter(getInsets().left + 10, getInsets().top + 32, 0, 0);
+        statsCounter.windowSize = new Vector2(getWidth(), getHeight());
         Vector2 p = map.getPoint(1, 1);
 
         ArrayList<Vector2> emptySpaces = new ArrayList<>();
@@ -56,19 +62,21 @@ public class Window extends JFrame implements KeyListener {
         );
 
 
-        // make it one pixel smaller than the grid so it can squeeze through the walls
         Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
-//        Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         playerRect.pad(player.getWidth(), player.getHeight());
         player.setHitbox(playerRect);
         player.setMap(map);
         player.setWalls(walls);
         player.setGridPos(spawn);
         player.setupImages("./img/pacman");
+
         entities.add(player);
+
+        entities.add(statsCounter);
 
         for (Entity f : food) {
             ((Food) f).player = player;
+            ((Food) f).counter = statsCounter;
         }
 
 
@@ -125,7 +133,11 @@ public class Window extends JFrame implements KeyListener {
             e.draw(g);
             if (hitbox) {
                 g.setColor(Color.GREEN);
-                g.drawRect(e.getX() + e.hitbox.getX(), e.getY() + e.hitbox.getY(), e.hitbox.getWidth(), e.hitbox.getHeight());
+                try {
+                    g.drawRect(e.getX() + e.hitbox.getX(), e.getY() + e.hitbox.getY(), e.hitbox.getWidth(), e.hitbox.getHeight());
+                } catch (NullPointerException err) {
+                    continue;
+                }
             }
         }
     }
@@ -160,13 +172,16 @@ public class Window extends JFrame implements KeyListener {
                     int foodYOffset = (pixelPerVerticalGrid - foodHeight) / 2;
                     Food f = new Food(foodXOffset + xPos, foodYOffset + yPos,
                             foodWidth, foodHeight);
-                    f.setHitbox(new Rect(0, 0, foodWidth, foodHeight));
+                    f.setHitbox(new Rect(foodWidth / 4, foodHeight / 4, foodWidth / 2, foodHeight / 2));
                     food.add(f);
                 }
                 map.setPoint(new Vector2(xPos, yPos), j, i);
-//                map.setPixelPoint(j, i, new Vector2(xPos, yPos));
             }
         }
+    }
+
+    public void setFPS(int n) {
+        statsCounter.setFPS(n);
     }
 
     @Override
@@ -186,6 +201,10 @@ public class Window extends JFrame implements KeyListener {
             }
         }
     }
+
+//    public void setTitle(String t) {
+//
+//    }
 
     @Override
     public void keyReleased(KeyEvent e) {

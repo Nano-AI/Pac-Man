@@ -9,7 +9,6 @@ public class Wall extends Entity {
     }
 
     public void draw(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
         g.setColor(Color.BLUE);
         g.fillRect(getX(), getY(), getWidth(), getHeight());
     }

@@ -11,10 +11,12 @@ public class Main {
         while (running) {
             long now = System.nanoTime();
             long updateTime = now - lastLoopTime;
+            int FPS = (int) (1.0 / (updateTime / 1_000_000_000.0));
             lastLoopTime = now;
 
             double delta = updateTime / (double) OPTIMAL_TIME;
 
+            window.setFPS(FPS);
             window.update(delta);
             window.render(false);
         }
