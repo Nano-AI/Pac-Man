@@ -1,9 +1,23 @@
+/**
+ * The FileReader class provides a static method to read a file and create a Map object.
+ * It reads the contents of the file, determines the dimensions, and populates a Map accordingly.
+ *
+ * @author Aditya B, Ekam S
+ * @version 26 November, 2023
+ */
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class FileReader {
+
+    /**
+     * Read a file and create a Map object based on its contents.
+     *
+     * @param path The path to the file to be read.
+     * @return A Map object representing the contents of the file.
+     */
     public static Map readFile(String path) {
         int width = 0;
         int height = 0;

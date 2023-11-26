@@ -1,11 +1,15 @@
+/**
+ * The Utils class contains utility methods used throughout the game.
+ * It includes functions for handling directions, clamping values, checking ranges, and reading images.
+ *
+ * @author Aditya B, Ekam S
+ * @version 26 November, 2023
+ */
+
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class Utils {
     public static char[] cardinalDirections = new char[]{'n', 'e', 's', 'w'};
@@ -15,21 +19,61 @@ public class Utils {
             new Vector2(0, 1),
             new Vector2(-1, 0)
     };
+
+    /**
+     * Clamp a value within a specified range.
+     *
+     * @param v   The value to clamp.
+     * @param min The minimum value of the range.
+     * @param max The maximum value of the range.
+     * @return The clamped value.
+     */
     public static int clamp(int v, int min, int max) {
         return Math.max(min, Math.min(max, v));
     }
+
+    /**
+     * Check if a double value is within a specified range.
+     *
+     * @param value The value to check.
+     * @param min   The minimum value of the range.
+     * @param max   The maximum value of the range.
+     * @return True if the value is within the range, false otherwise.
+     */
     public static boolean inRange(double value, double min, double max) {
         return (value >= min) && (value <= max);
     }
 
+    /**
+     * Check if a double value is inside a specified range (excluding the bounds).
+     *
+     * @param value The value to check.
+     * @param min   The minimum value of the range.
+     * @param max   The maximum value of the range.
+     * @return True if the value is inside the range, false otherwise.
+     */
     public static boolean inside(double value, double min, double max) {
         return (value > min) && (value < max);
     }
 
+    /**
+     * Check if a value is within a specified range with a given percentage tolerance.
+     *
+     * @param value   The value to check.
+     * @param equal   The target value.
+     * @param percent The percentage tolerance.
+     * @return True if the value is within the range, false otherwise.
+     */
     public static boolean withinRange(double value, double equal, double percent) {
         return value * (1 - percent) <= equal && value * (1 + percent) >= equal;
     }
 
+    /**
+     * Get the cardinal direction character based on a direction vector.
+     *
+     * @param d The direction vector.
+     * @return The cardinal direction character ('n', 'e', 's', 'w').
+     */
     public static char getDirection(Vector2 d) {
         if (d.equals(getDirection('n'))) {
             return 'n';
@@ -44,6 +88,12 @@ public class Utils {
         }
     }
 
+    /**
+     * Get the direction vector based on a cardinal direction character.
+     *
+     * @param d The cardinal direction character.
+     * @return The direction vector.
+     */
     public static Vector2 getDirection(char d) {
         int x = 0;
         int y = 0;
@@ -60,6 +110,12 @@ public class Utils {
         return new Vector2(x, y);
     }
 
+    /**
+     * Read a sequence of images from a specified folder.
+     *
+     * @param folder The path to the folder containing images.
+     * @return An array of BufferedImage objects representing the images.
+     */
     public static BufferedImage[] getImages(String folder) {
         File dir = new File(folder);
         File[] listing = dir.listFiles();

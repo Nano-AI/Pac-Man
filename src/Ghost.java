@@ -5,6 +5,8 @@ public class Ghost extends Entity {
 
     public Ghost(int x, int y, int gridX, int gridY, int width, int height) {
         super(x, y, gridX, gridY, width, height);
+
+        setupImages("./img/pacman");
     }
 
     @Override
