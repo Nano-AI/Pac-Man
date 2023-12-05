@@ -1,10 +1,10 @@
 /**
  * Main class which includes game loops and runs the game.
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 public class Main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         // create a window to display the game, and provide the map of the game
         Window window = new Window("Pac-Man", FileReader.readFile("./template.map"));
         // display the window
@@ -31,7 +31,7 @@ public class Main {
             // update the game based on delta
             window.update(delta);
             // render the game and disable hitbox outlines
-            window.render(false);
+            window.render(true);
         }
     }
 }

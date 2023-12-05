@@ -3,7 +3,7 @@
  * It includes functions for handling directions, clamping values, checking ranges, and reading images.
  *
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 
 import javax.imageio.ImageIO;
@@ -141,5 +141,11 @@ public class Utils {
         }
 
         return o;
+    }
+
+    public static double pythag(double a, double b) {
+        return Math.sqrt(
+                a * a + b * b
+        );
     }
 }

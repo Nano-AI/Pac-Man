@@ -3,7 +3,7 @@
  * It extends the Entity class and includes methods for player movement and collision detection.
  *
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 public class Player extends Entity {
     private Vector2 prevDirection;
     private Vector2 wantedDirection;
-    private Map m;
     private Vector2 nextPos;
 
     private ArrayList<Entity> collisions;
@@ -67,6 +66,7 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
         drawImage(g);
+        g.fillRect((int) getGridPos().x, (int) getGridPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
     }
 
     /**
@@ -147,6 +147,9 @@ public class Player extends Entity {
             incrementFrameIndex();
             deltaAnimate = 0;
         }
+
+        // update the grid spot at which the player is currently at
+        updateGridSpot();
     }
 
     /**

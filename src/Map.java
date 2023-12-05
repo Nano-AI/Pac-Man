@@ -3,7 +3,7 @@
  * It stores information about the layout of the game world, including characters at different positions.
  *
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 
 public class Map {
@@ -12,6 +12,8 @@ public class Map {
 
     private Vector2[][] points;
     private Vector2[][] pixelPoints;
+    private Vector2 playerPos;
+    private double minDist = Double.MAX_VALUE;
 
     public int pixelPerHorizontalGrid, pixelPerVerticalGrid;
 
@@ -102,5 +104,20 @@ public class Map {
             o.append("\n");
         }
         return o.toString();
+    }
+
+    public void updatePlayerPos(Vector2 pos, double minDist) {
+        if (minDist < this.minDist) {
+            this.playerPos = pos;
+            this.minDist = minDist;
+        }
+    }
+
+    public Vector2 getPlayerPos() {
+        return playerPos.copy();
+    }
+
+    public void resetCount() {
+        minDist = Double.MAX_VALUE;
     }
 }

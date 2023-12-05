@@ -1,7 +1,7 @@
 /**
  * Window class which combines all components of the game into one class to manage everything.
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 
 import javax.swing.*;
@@ -18,6 +18,7 @@ public class Window extends JFrame implements KeyListener {
     private ArrayList<Entity> walls;
     private ArrayList<Entity> food;
     private ArrayList<Ghost> ghosts;
+    private ArrayList<Grid> grids;
     private StatsCounter statsCounter;
     Player player;
     // variables to keep track of window config things
@@ -38,6 +39,8 @@ public class Window extends JFrame implements KeyListener {
         this.map = m;
         entities = new ArrayList<>();
         food = new ArrayList<>();
+        ghosts = new ArrayList<>();
+        grids = new ArrayList<>();
 
         // set title
         setTitle(title);
@@ -51,6 +54,9 @@ public class Window extends JFrame implements KeyListener {
         bufferImage = createImage(getWidth(), getHeight());
         // set the buffer
         buffer = (Graphics2D) bufferImage.getGraphics();
+        // disable antialiasing to remove blurry photos
+        buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
         // add key listeners for key press events
         addKeyListener(this);
@@ -67,11 +73,30 @@ public class Window extends JFrame implements KeyListener {
         setupStats();
         setupFood();
         setupGhosts();
+        setupGrid();
 
         // iterate through all the entities and set the grid size;
         // TODO: might have to remove this
         for (Entity e : entities) {
             e.setGridSize(new Vector2(pixelPerHorizontalGrid, pixelPerVerticalGrid));
+        }
+    }
+
+    private void setupGrid() {
+        for (int i = 0; i < map.height; i++) {
+            for (int j = 0; j < map.width; j++) {
+                Vector2 p = map.getPoint(i, j);
+                Grid g = new Grid((int) p.x, (int) p.y, j, i, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+                g.map = map;
+                g.player = player;
+                grids.add(g);
+                addEntity(g);
+            }
+        }
+
+        // set grids for all entities
+        for (Entity e : entities) {
+            e.grids = grids;
         }
     }
 
@@ -97,6 +122,12 @@ public class Window extends JFrame implements KeyListener {
         // create a ghost at that position
         Ghost g = new Ghost((int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        ghosts.add(g);
+
+        for (Ghost gh : ghosts) {
+            gh.player = this.player;
+            addEntity(gh);
+        }
     }
 
     /**
@@ -152,6 +183,9 @@ public class Window extends JFrame implements KeyListener {
                 pixelPerVerticalGrid
         );
 
+
+        // set the player's pos through the map
+        player.setGridPos(spawnGrid);
         // setup the player hitbox
         Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         // add some padding

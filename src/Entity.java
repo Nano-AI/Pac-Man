@@ -2,11 +2,13 @@
  * The entity class which keeps track of each renderable thing in the game.
  *
  * @author Aditya B, Ekam S
- * @version 26 November, 2023
+ * @version 4 December, 2023
  */
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.sql.Array;
+import java.util.ArrayList;
 
 public class Entity {
 
@@ -21,7 +23,12 @@ public class Entity {
 
     public Rect hitbox; // Rectangle representing the hitbox of the entity
 
+    public Map m;
+
     private int frameIndex = 0; // Index of the current frame for animation
+
+    // arraylist to keep track of grids
+    public ArrayList<Grid> grids;
 
     /**
      * Get the array of images associated with this entity.
@@ -88,6 +95,8 @@ public class Entity {
         this.pos = new Vector2(x, y);
         this.gridPos = new Vector2(gridX, gridY);
         this.hitbox = new Rect(0, 0, width, height);
+        this.width = width;
+        this.height = height;
         this.hitbox.size = new Vector2(width, height);
     }
 
@@ -126,9 +135,6 @@ public class Entity {
      *
      * @return A copy of the grid position.
      */
-    public Vector2 getGridPos() {
-        return this.gridPos.copy();
-    }
 
     /**
      * Check if this entity is completely inside another entity based on hitbox inclusion.
@@ -300,5 +306,35 @@ public class Entity {
      */
     public void draw(Graphics g) {
         // To be implemented
+    }
+
+    public double distanceTo(Entity e) {
+        return Utils.pythag(getX() - e.getX(), getY() - e.getY());
+    }
+
+    /**
+     * Updates the grid (array spot) of the player.
+     */
+    public void updateGridSpot() {
+        // store the min dist of the closest grid
+        // iterate through all grids
+//        double minDist = Double.MAX_VALUE;
+        for (Entity w : grids) {
+            // get the distance to the wall
+            double d = distanceTo(w);
+            // check if dist is less than min dist
+            if (Utils.inside(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
+//            if (d < minDist) {
+                // updatge
+                gridPos = w.getPos();
+                return;
+//                System.out.println();
+//                minDist = d;
+            }
+        }
+    }
+
+    public Vector2 getGridPos() {
+        return this.gridPos.copy();
     }
 }
