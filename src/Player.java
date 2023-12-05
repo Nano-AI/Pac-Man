@@ -66,7 +66,7 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
         drawImage(g);
-        g.fillRect((int) getGridPos().x, (int) getGridPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
+//        g.fillRect((int) getGridPos().x, (int) getGridPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
     }
 
     /**

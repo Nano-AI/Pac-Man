@@ -2,6 +2,8 @@
 
 A Pac-Man clone created in Java.
 
+![pacman](./img/game.png)
+
 ## Description
 
 The purpose of this project is to replicate the famous 1980’s game, Pac-Man. 
