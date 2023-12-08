@@ -8,6 +8,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class FileReader {
@@ -27,6 +28,7 @@ public class FileReader {
             s = new Scanner(new File(path));
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + path);
+            return null;
         }
 
         ArrayList<String> file = new ArrayList<>();
@@ -44,7 +46,14 @@ public class FileReader {
             String line = file.get(i);
             for (int j = 0; j < line.length(); j++) {
                 m.set(line.charAt(j), i, j);
+                if (line.charAt(j) == 'W') {
+                    m.setBase(line.charAt(j), i, j);
+                }
             }
+        }
+
+        for (char[] l : m.baseGrid) {
+            System.out.println(Arrays.toString(l));
         }
 
         return m;

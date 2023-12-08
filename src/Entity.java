@@ -7,7 +7,6 @@
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.sql.Array;
 import java.util.ArrayList;
 
 public class Entity {
@@ -308,33 +307,80 @@ public class Entity {
         // To be implemented
     }
 
-    public double distanceTo(Entity e) {
+    /**
+     * Gets the distance using the distance formula of sqrt( (x_1 - x_2)^2 + (y_1 - y_2)^2 )
+     * @param e Entity to find distance from
+     * @return A double value calculating the distance
+     */
+    public double getDistanceTo(Entity e) {
         return Utils.pythag(getX() - e.getX(), getY() - e.getY());
     }
 
     /**
-     * Updates the grid (array spot) of the player.
+     * Gets the distance between two entities as a Vector2 instead of a scalar
+     * @param e Entity to find distance from
+     * @return A Vector2 rep of the distance between
      */
-    public void updateGridSpot() {
-        // store the min dist of the closest grid
-        // iterate through all grids
-//        double minDist = Double.MAX_VALUE;
-        for (Entity w : grids) {
-            // get the distance to the wall
-            double d = distanceTo(w);
-            // check if dist is less than min dist
-            if (Utils.inside(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
-//            if (d < minDist) {
-                // updatge
-                gridPos = w.getPos();
-                return;
-//                System.out.println();
-//                minDist = d;
-            }
-        }
+    public Vector2 getVectorDistance(Entity e) {
+        return this.pos.distanceTo(e.pos);
     }
 
+    /**
+     * Updates the grid (array spot) of the player.
+     * @see Grid
+     * @return The vector position the player is at
+     */
+    public Vector2 updateGridSpot() {
+        // store the min dist of the closest grid
+        // iterate through all grids
+        for (Entity w : grids) {
+            // get the distance to the wall
+            double d = getDistanceTo(w);
+            // get the smallest dist; the one between [0, width / 2] distance away;
+            if (Utils.inside(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
+                // set grid pos
+                gridPos = w.getPos();
+                return gridPos.copy();
+            }
+        }
+        // there were no near grids that the player could be on
+        return null;
+    }
+
+    /**
+     * Get the grid position of the player. REQUIRES FOR GRID POS TO BE UPDATED EVERY FRAME!
+     * @return A copy of current grid pos
+     */
     public Vector2 getGridPos() {
         return this.gridPos.copy();
+    }
+
+    /**
+     * Adds an x value to the current x position
+     * @param x Value to change the X by
+     * @return The new x position
+     */
+    public double addX(double x) {
+        this.pos.x += x;
+        return this.pos.x;
+    }
+
+    /**
+     * Adds a y value to the current y position
+     * @param y Value to change the y by
+     * @return The new y position
+     */
+    public double addY(double y) {
+        this.pos.y += y;
+        return this.pos.y;
+    }
+
+    /**
+     * Adds a Vector2 to current pos
+     * @param pos Vector2 to add to current pos
+     * @return The new position
+     */
+    public Vector2 addPos(Vector2 pos) {
+        return this.pos.add(pos);
     }
 }

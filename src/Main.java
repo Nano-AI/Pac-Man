@@ -22,9 +22,10 @@ public class Main {
             long now = System.nanoTime();
             long updateTime = now - lastLoopTime;
             int FPS = (int) (1.0 / (updateTime / 1_000_000_000.0));
-            lastLoopTime = now;
 
             double delta = updateTime / (double) OPTIMAL_TIME;
+
+            lastLoopTime = now;
 
             // set the display FPS
             window.setFPS(FPS);
