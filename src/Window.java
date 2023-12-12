@@ -124,11 +124,13 @@ public class Window extends JFrame implements KeyListener {
         // create a ghost at that position
         Ghost g = new Ghost((int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        g.name = 'p';
         ghosts.add(g);
 
         for (Ghost gh : ghosts) {
             gh.player = this.player;
 //            gh.map = this.map;
+            gh.walls = walls;
             gh.updateMap(this.map);
             addEntity(gh);
         }

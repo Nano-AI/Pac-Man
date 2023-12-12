@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+// TODO: Must turn DeltaT to a class variable, that way we don't need it as a parameter! OR have a better way to call deltaT
 public class Entity {
 
     // The position of the entity
@@ -30,6 +31,18 @@ public class Entity {
     public ArrayList<Grid> grids;
 
     public char mapChar = ' ';
+
+    public Vector2 prevDirection;
+    public Vector2 nextPos;
+
+    public ArrayList<Entity> collisions;
+    public ArrayList<Entity> walls;
+    public Vector2 nextGridPos;
+    public Vector2 wantedDirection;
+
+    public boolean blocked;
+
+    public double speed;
 
     /**
      * Get the array of images associated with this entity.
@@ -83,6 +96,26 @@ public class Entity {
     }
 
     /**
+     * Alternate constructor for the Entity class with specified parameters.
+     *
+     * @param x      The x-coordinate of the entity's position.
+     * @param y      The y-coordinate of the entity's position.
+     * @param width  The width of the entity.
+     * @param height The height of the entity.
+     */
+    public Entity(int x, int y, int width, int height) {
+        this.pos = new Vector2(x, y);
+        this.width = width;
+        this.height = height;
+
+        walls = new ArrayList<>();
+        collisions = new ArrayList<>();
+        setDirection('0');
+        wantedDirection = getDirection();
+        prevDirection = getDirection();
+    }
+
+    /**
      * Constructor for the Entity class with specified parameters.
      *
      * @param x      The x-coordinate of the entity's position.
@@ -93,10 +126,8 @@ public class Entity {
      * @param height The height of the entity.
      */
     public Entity(int x, int y, int gridX, int gridY, int width, int height) {
-        this.pos = new Vector2(x, y);
+        this(x, y, width, height);
         this.hitbox = new Rect(0, 0, width, height);
-        this.width = width;
-        this.height = height;
         this.hitbox.size = new Vector2(width, height);
     }
 
@@ -177,19 +208,6 @@ public class Entity {
         return getPos().copy().add(getSize().copy().multiply(0.5));
     }
 
-    /**
-     * Alternate constructor for the Entity class with specified parameters.
-     *
-     * @param x      The x-coordinate of the entity's position.
-     * @param y      The y-coordinate of the entity's position.
-     * @param width  The width of the entity.
-     * @param height The height of the entity.
-     */
-    public Entity(int x, int y, int width, int height) {
-        this.pos = new Vector2(x, y);
-        this.width = width;
-        this.height = height;
-    }
 
     /**
      * Get the x-coordinate of the entity's position.
@@ -377,5 +395,113 @@ public class Entity {
      */
     public Vector2 addPos(Vector2 pos) {
         return this.pos.add(pos);
+    }
+
+    /**
+     * Move the player towards a specified direction.
+     *
+     * @param direction The direction vector to move towards.
+     * @param deltaT    The time elapsed since the last update.
+     */
+    public void goTowards(Vector2 direction, double deltaT) {
+        prevDirection = getDirection().copy();
+        setDirection(direction);
+        setPos(getNextPos(speed, direction, deltaT));
+    }
+
+    /**
+     * Check if the next position is blocked by collisions.
+     *
+     * @param direction The direction vector to check.
+     * @param deltaT    The time elapsed since the last update.
+     * @return True if the next position is blocked, false otherwise.
+     */
+    boolean nextIsBlocked(Vector2 direction, double deltaT) {
+        this.collisions.clear();
+        // I HAVE NO CLUE WHY GETTING SIZE AND DIVIDING BY 16 WORKS, BUT HEY, IT DOES!
+        Entity c = getNextPosEntity((int) (getSize().x / 16), direction, 1);
+        boolean blocked = false;
+
+        for (Entity wall : walls) {
+            if (c.isIn(wall)) {
+                this.collisions.add(wall);
+                blocked = true;
+                break;
+            }
+        }
+
+        return blocked;
+    }
+
+    /**
+     * Get the entity at the next position based on distance and direction.
+     *
+     * @param distance The distance to the next position.
+     * @param direction The direction vector.
+     * @param deltaT    The time elapsed since the last update.
+     * @return The entity at the next position.
+     */
+    public Entity getNextPosEntity(double distance, Vector2 direction, double deltaT) {
+        Vector2 check = getNextPos(distance, direction, deltaT);
+        Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
+        c.hitbox = hitbox.copy();
+        return c;
+    }
+
+    /**
+     * Get the next position based on distance and direction.
+     *
+     * @param distance The distance to the next position.
+     * @param direction The direction vector.
+     * @param deltaT    The time elapsed since the last update.
+     * @return The next position vector.
+     */
+    public Vector2 getNextPos(double distance, Vector2 direction, double deltaT) {
+        return getPos().copy().add(direction.copy().multiply(distance * deltaT));
+    }
+
+    /**
+     * Set the wanted direction based on a character input.
+     *
+     * @param direction The character representing the new direction.
+     */
+    public void setWantedDirection(char direction) {
+        wantedDirection = Utils.getDirection(direction);
+    }
+
+    // TODO: Rewrite to use grid since function for grid positions now updates dynamically
+    // TODO: replace instead of collisions
+    public void moveInDirection(double deltaT) {
+        // check if the wanted direction's path is blocked
+        boolean newPath = nextIsBlocked(wantedDirection, deltaT);
+        // check if the current direction's path is blocked
+        boolean samePath = nextIsBlocked(getDirection(), deltaT);
+        blocked = true;
+
+        // if the new path isn't blocked AND it's not the opposite direction,
+        // UNLESS we're blocked and one of the ways to go is the other way THEN, go the direction
+        if (
+                ( !newPath && !wantedDirection.equals(getDirection().multiply(-1)) )
+                || ( samePath && wantedDirection.equals(getDirection().multiply(-1)) )
+        ) {
+            Vector2 temp = getDirection();
+            // go towards the wanted direction
+            goTowards(wantedDirection, deltaT);
+            // set the previous direction if it isn't the same as the one we're pressing down
+            if (!temp.equals(getDirection())) {
+                prevDirection = temp;
+            }
+            blocked = false;
+        } else if (!samePath) {
+            // otherwise if the same path isn't blocked but the new one is
+            Vector2 temp = getDirection();
+            // go towards the current direction
+            goTowards(getDirection(), deltaT);
+            // and set prev direction if it isn't the same as pressing down
+            if (!temp.equals(getDirection())) {
+                prevDirection = temp;
+            }
+            blocked = false;
+        }
     }
 }

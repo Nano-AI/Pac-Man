@@ -138,4 +138,8 @@ public class Vector2 {
                 this.y - pos.y
         );
     }
+
+    public Vector2 swap() {
+        return new Vector2(y, x);
+    }
 }

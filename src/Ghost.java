@@ -24,6 +24,8 @@ public class Ghost extends Entity {
 
     Queue<Vector2> path;
 
+    private double randomT = 0;
+
     public Ghost(int x, int y, int gridX, int gridY, int width, int height) {
         super(x, y, gridX, gridY, width, height);
         System.out.println(getWidth() + " " + getHeight());
@@ -40,27 +42,21 @@ public class Ghost extends Entity {
 //        if (getDistanceTo(player) < detectionRadius) {
 //            addPos(player.getVectorDistance(this).multiply(0.05 * deltaT));
 //        }
+        randomT += deltaT;
         updateGridSpot();
-        move();
+        move(deltaT);
+        speed = 1.75;
 //        finder.solve(this.getGridPos().gridPos, player.getGridPos().gridPos);
 //        System.out.println(finder.toString());
     }
 
-    public void move() {
-        if (path.size() == 0) {
-            setupPath();
-        }
-    }
-    
-    private void setupPath() {
-        System.out.println(path.size());
-        moveRandom();
+    public void move(double deltaT) {
         switch (name) {
             case 'r':
                 moveChase();
                 break;
             default:
-                moveRandom();
+                moveRandom(deltaT);
         }
     }
 
@@ -68,13 +64,19 @@ public class Ghost extends Entity {
 
     }
 
-    private void moveRandom() {
-        Vector2 newSpot = this.map.getRandomGridSpot();
-        finder.solve(this.getGridPos().gridPos, newSpot);
-        System.out.println("SDFSDF");
-        System.out.println(finder);
-        System.out.println("SDFSDF");
-        path.add(newSpot);
+    private void moveRandom(double deltaT) {
+        if (randomT > Math.random() * 10 || blocked) {
+            ArrayList<Vector2> spots = map.getNeighbors(getGridPos().gridPos);
+            System.out.println(spots);
+            Vector2 dir;
+            int rand = (int) (Math.random() * spots.size());
+            dir = spots.get(rand);
+            spots.forEach(i -> {System.out.print(Utils.getDirection(i));});
+            System.out.println();
+            setWantedDirection(Utils.getDirection(dir));
+            randomT = 0;
+        }
+        moveInDirection(deltaT);
     }
 
     public void updateMap(Map m) {
@@ -89,8 +91,8 @@ public class Ghost extends Entity {
         Vector2 size = getSize();
 
         g.setColor(Color.green);
+        g2.fillRect((int) getGridPos().getX(), (int) getGridPos().getY(), getWidth(), getHeight());
         g2.drawRect(getX(), getY(), getWidth(), getHeight());
-//        g2.fillRect((int) getGridPos().x, (int) getGridPos().y, getWidth(), getHeight());
         g2.drawImage(getImage(), (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
 
 //        ArrayList<Entity> path = getPathTo(player);

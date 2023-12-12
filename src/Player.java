@@ -15,13 +15,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Player extends Entity {
-    private Vector2 prevDirection;
-    private Vector2 wantedDirection;
-    private Vector2 nextPos;
-
-    private ArrayList<Entity> collisions;
-    private ArrayList<Entity> walls;
-    private Vector2 nextGridPos;
     private double deltaAnimate = 0;
     private boolean blocked = false;
 
@@ -37,14 +30,10 @@ public class Player extends Entity {
      */
     public Player(int x, int y, int width, int height) {
         super(x, y, width, height);
-        walls = new ArrayList<>();
-        collisions = new ArrayList<>();
-        setDirection('0');
-        wantedDirection = getDirection();
-        prevDirection = getDirection();
         mapChar = 'P';
 
         visited = new LinkedList<>();
+        speed = 1.8;
     }
 
     /**
@@ -75,7 +64,7 @@ public class Player extends Entity {
         drawImage(g);
 //        for (Grid w : grids) {
 //        }
-        g.fillRect((int) getGridPos().getPos().x, (int) getGridPos().getPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
+//        g.fillRect((int) getGridPos().getPos().x, (int) getGridPos().getPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
     }
 
     /**
@@ -116,6 +105,9 @@ public class Player extends Entity {
         if (!getGridPos().gridPos.equals(visited.peek())) {
             visited.add(getGridPos().gridPos);
         }
+        if (visited.size() > 15) {
+            visited.remove();
+        }
     }
 
     /**
@@ -131,35 +123,9 @@ public class Player extends Entity {
         // set the deltaT
         deltaAnimate += deltaT;
 
-        // check if the wanted direction's path is blocked
-        boolean newPath = nextIsBlocked(wantedDirection, deltaT);
-        // check if the current direction's path is blocked
-        boolean samePath = nextIsBlocked(getDirection(), deltaT);
-        blocked = true;
+        moveInDirection(deltaT);
 
-        // if the new path isn't blocked, go the direction
-        if (!newPath) {
-            Vector2 temp = getDirection();
-            // go towards the wanted direction
-            goTowards(wantedDirection, deltaT);
-            // set the previous direction if it isn't the same as the one we're pressing down
-            if (!temp.equals(getDirection())) {
-                prevDirection = temp;
-            }
-            blocked = false;
-        } else if (!samePath) {
-            // otherwise if the same path isn't blocked but the new one is
-            Vector2 temp = getDirection();
-            // go towards the current direction
-            goTowards(getDirection(), deltaT);
-            // and set prev direction if it isn't the same as pressing down
-            if (!temp.equals(getDirection())) {
-                prevDirection = temp;
-            }
-            blocked = false;
-        }
-
-        // animate every 5 (forgot units), and make sure it's not blocekd and moving
+        // animate every 5 (forgot units ms), and make sure it's not blocekd and moving
         if (deltaAnimate >= 5 && !blocked) {
             incrementFrameIndex();
             deltaAnimate = 0;
@@ -167,77 +133,5 @@ public class Player extends Entity {
 
         // update the grid spot at which the player is currently at
         updateGridSpot();
-    }
-
-    /**
-     * Move the player towards a specified direction.
-     *
-     * @param direction The direction vector to move towards.
-     * @param deltaT    The time elapsed since the last update.
-     */
-    private void goTowards(Vector2 direction, double deltaT) {
-        prevDirection = getDirection().copy();
-        setDirection(direction);
-        setPos(getNextPos(1.8, direction, deltaT));
-    }
-
-    /**
-     * Check if the next position is blocked by collisions.
-     *
-     * @param direction The direction vector to check.
-     * @param deltaT    The time elapsed since the last update.
-     * @return True if the next position is blocked, false otherwise.
-     */
-    private boolean nextIsBlocked(Vector2 direction, double deltaT) {
-        this.collisions.clear();
-        // I HAVE NO CLUE WHY GETTING SIZE AND DIVIDING BY 16 WORKS, BUT HEY, IT DOES!
-        Entity c = getNextPosEntity((int) (getSize().x / 16), direction, 1);
-        boolean blocked = false;
-
-        for (Entity wall : walls) {
-            if (c.isIn(wall)) {
-                this.collisions.add(wall);
-                blocked = true;
-                break;
-            }
-        }
-
-        return blocked;
-    }
-
-    /**
-     * Get the entity at the next position based on distance and direction.
-     *
-     * @param distance The distance to the next position.
-     * @param direction The direction vector.
-     * @param deltaT    The time elapsed since the last update.
-     * @return The entity at the next position.
-     */
-    private Entity getNextPosEntity(double distance, Vector2 direction, double deltaT) {
-        Vector2 check = getNextPos(distance, direction, deltaT);
-        Entity c = new Entity((int) check.x, (int) check.y, getWidth(), getHeight());
-        c.hitbox = hitbox.copy();
-        return c;
-    }
-
-    /**
-     * Get the next position based on distance and direction.
-     *
-     * @param distance The distance to the next position.
-     * @param direction The direction vector.
-     * @param deltaT    The time elapsed since the last update.
-     * @return The next position vector.
-     */
-    private Vector2 getNextPos(double distance, Vector2 direction, double deltaT) {
-        return getPos().copy().add(direction.copy().multiply(distance * deltaT));
-    }
-
-    /**
-     * Set the wanted direction based on a character input.
-     *
-     * @param direction The character representing the new direction.
-     */
-    public void setWantedDirection(char direction) {
-        wantedDirection = Utils.getDirection(direction);
     }
 }

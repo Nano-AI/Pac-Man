@@ -1,3 +1,4 @@
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -60,7 +61,7 @@ public class Map {
      */
     public char at(int x, int y) {
         if (x > height || x < 0 || y > width || y < 0) {
-            return ' ';
+            return 'W';
         }
         return grid[x][y];
     }
@@ -162,6 +163,17 @@ public class Map {
         }
     }
 
-    public void update(ArrayList<Entity> es) {
+    public ArrayList<Vector2> getNeighbors(Vector2 pos) {
+        ArrayList<Vector2> o = new ArrayList<>();
+
+        for (char c : Utils.cardinalDirections) {
+            Vector2 d = Utils.getDirection(c);
+            System.out.println(at(pos.add(Utils.getDirection(c))));
+            if (at(pos.add(Utils.getDirection(c))) != 'W') {
+                o.add(d);
+            }
+        }
+
+        return o;
     }
 }
