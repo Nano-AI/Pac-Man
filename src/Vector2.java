@@ -131,4 +131,11 @@ public class Vector2 {
     public String toString() {
         return String.format("{x=%.2f, y=%.2f}", x, y);
     }
+
+    public Vector2 distanceTo(Vector2 pos) {
+        return new Vector2(
+                this.x - pos.x,
+                this.y - pos.y
+        );
+    }
 }

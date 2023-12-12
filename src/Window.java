@@ -259,8 +259,12 @@ public class Window extends JFrame implements KeyListener {
         updateList(walls);
         updateList(food);
 
-        map.clearGrid();
-        map.update(entities);
+        updateMap();
+    }
+
+    private void updateMap() {
+        for (Entity e : entities) {
+        }
     }
 
     /**

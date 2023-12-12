@@ -32,6 +32,7 @@ public class Map {
         this.height = height;
 
         this.grid = new char[height][width];
+        this.baseGrid = new char[height][width];
         this.points = new Vector2[height][width];
         this.pixelPoints = new Vector2[height][width];
 
@@ -75,6 +76,10 @@ public class Map {
      */
     public void set(char v, int x, int y) {
         grid[x][y] = v;
+    }
+
+    public void setBase(char v, int x, int y) {
+        baseGrid[x][y] = v;
     }
 
     /**
