@@ -36,7 +36,9 @@ public class Map {
         this.points = new Vector2[height][width];
         this.pixelPoints = new Vector2[height][width];
 
-        this.baseGrid = new char[height][width];
+        for (char[] a : this.baseGrid) {
+            Arrays.fill(a, ' ');
+        }
     }
 
     /**
@@ -121,6 +123,22 @@ public class Map {
             o.append("\n");
         }
         return o.toString();
+    }
+
+    public Vector2 getRandomGridSpot() {
+        ArrayList<Vector2> emptySpaces = new ArrayList<>();
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (at(i, j) == '.') {
+                    emptySpaces.add(new Vector2(i, j));
+                }
+            }
+        }
+
+        // get a random empty position on the map
+        // this is in terms of array coordintes
+        Vector2 spawnGrid = emptySpaces.get((int) (Math.random() * emptySpaces.size()));
+        return spawnGrid;
     }
 
     public void updatePlayerPos(Vector2 pos, double minDist) {

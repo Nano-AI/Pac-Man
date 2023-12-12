@@ -322,13 +322,12 @@ public class Entity {
      * @param e Entity to find distance from
      * @return A Vector2 rep of the distance between
      */
-<<<<<<< HEAD
     public void updateGridSpot() {
         // store the min dist of the closest grid
         // iterate through all grids
         for (Grid w : grids) {
             // get the distance to the wall
-            double d = distanceTo(w);
+            double d = getDistanceTo(w);
             // check if dist is less than min dist
             if (Utils.inRange(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
                 this.gridPos = w;
@@ -337,42 +336,18 @@ public class Entity {
         }
     }
 
-    public Grid getGridPos() {
-        return this.gridPos;
-=======
-    public Vector2 getVectorDistance(Entity e) {
-        return this.pos.distanceTo(e.pos);
-    }
-
-    /**
-     * Updates the grid (array spot) of the player.
-     * @see Grid
-     * @return The vector position the player is at
-     */
-    public Vector2 updateGridSpot() {
-        // store the min dist of the closest grid
-        // iterate through all grids
-        for (Entity w : grids) {
-            // get the distance to the wall
-            double d = getDistanceTo(w);
-            // get the smallest dist; the one between [0, width / 2] distance away;
-            if (Utils.inside(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
-                // set grid pos
-                gridPos = w.getPos();
-                return gridPos.copy();
-            }
-        }
-        // there were no near grids that the player could be on
-        return null;
-    }
 
     /**
      * Get the grid position of the player. REQUIRES FOR GRID POS TO BE UPDATED EVERY FRAME!
      * @return A copy of current grid pos
      */
-    public Vector2 getGridPos() {
-        return this.gridPos.copy();
->>>>>>> edd200a5749f5a326789e9673f6df3c1e83c953d
+
+    public Grid getGridPos() {
+        return this.gridPos;
+    }
+
+    public Vector2 getVectorDistance(Entity e) {
+        return this.pos.distanceTo(e.pos);
     }
 
     /**

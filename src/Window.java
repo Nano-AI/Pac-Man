@@ -128,7 +128,8 @@ public class Window extends JFrame implements KeyListener {
 
         for (Ghost gh : ghosts) {
             gh.player = this.player;
-            gh.map = this.map;
+//            gh.map = this.map;
+            gh.updateMap(this.map);
             addEntity(gh);
         }
     }
@@ -164,18 +165,7 @@ public class Window extends JFrame implements KeyListener {
      */
     private void setupPlayer() {
         // get an array list of empty spaces
-        ArrayList<Vector2> emptySpaces = new ArrayList<>();
-        for (int i = 0; i < map.height; i++) {
-            for (int j = 0; j < map.width; j++) {
-                if (map.at(i, j) == '.') {
-                    emptySpaces.add(new Vector2(i, j));
-                }
-            }
-        }
-
-        // get a random empty position on the map
-        // this is in terms of array coordintes
-        Vector2 spawnGrid = emptySpaces.get((int) (Math.random() * emptySpaces.size()));
+        Vector2 spawnGrid = map.getRandomGridSpot();
         // get the vector2 point as pixel coordinates
         Vector2 spawn = map.getPoint((int) spawnGrid.x, (int) spawnGrid.y);
         // setup the player

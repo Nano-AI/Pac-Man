@@ -11,6 +11,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Player extends Entity {
     private Vector2 prevDirection;
@@ -22,6 +24,8 @@ public class Player extends Entity {
     private Vector2 nextGridPos;
     private double deltaAnimate = 0;
     private boolean blocked = false;
+
+    public Queue<Vector2> visited;
 
     /**
      * Constructor for the Player class with specified parameters.
@@ -39,6 +43,8 @@ public class Player extends Entity {
         wantedDirection = getDirection();
         prevDirection = getDirection();
         mapChar = 'P';
+
+        visited = new LinkedList<>();
     }
 
     /**
@@ -104,6 +110,13 @@ public class Player extends Entity {
         // reset transform
         g2.setTransform(backup);
     }
+    
+    private void addPath() {
+        if (visited.peek() == null) return;
+        if (!getGridPos().gridPos.equals(visited.peek())) {
+            visited.add(getGridPos().gridPos);
+        }
+    }
 
     /**
      * Override of the update method to handle player movement and animation.
@@ -114,6 +127,7 @@ public class Player extends Entity {
      */
     @Override
     public void update(double deltaT) {
+        addPath();
         // set the deltaT
         deltaAnimate += deltaT;
 
