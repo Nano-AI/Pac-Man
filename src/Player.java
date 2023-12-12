@@ -38,6 +38,7 @@ public class Player extends Entity {
         setDirection('0');
         wantedDirection = getDirection();
         prevDirection = getDirection();
+        mapChar = 'P';
     }
 
     /**
@@ -66,7 +67,9 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
         drawImage(g);
-//        g.fillRect((int) getGridPos().x, (int) getGridPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
+//        for (Grid w : grids) {
+//        }
+        g.fillRect((int) getGridPos().getPos().x, (int) getGridPos().getPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
     }
 
     /**

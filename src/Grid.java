@@ -8,6 +8,7 @@ import java.awt.*;
 public class Grid extends Entity {
     Map map;
     Player player;
+    public Vector2 gridPos;
     public Grid(int x, int y, int gridX, int gridY, int width, int height) {
         super(x, y, gridX, gridY, width, height);
     }

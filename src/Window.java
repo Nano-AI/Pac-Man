@@ -58,10 +58,11 @@ public class Window extends JFrame implements KeyListener {
         buffer.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                 RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
+//        setupGridPos();
+
         // add key listeners for key press events
         addKeyListener(this);
     }
-
 
     /**
      * Sets up all the different entities in teh game
@@ -89,6 +90,7 @@ public class Window extends JFrame implements KeyListener {
                 Grid g = new Grid((int) p.x, (int) p.y, j, i, pixelPerHorizontalGrid, pixelPerVerticalGrid);
                 g.map = map;
                 g.player = player;
+                g.gridPos = new Vector2(i, j);
                 grids.add(g);
                 addEntity(g);
             }
@@ -126,6 +128,7 @@ public class Window extends JFrame implements KeyListener {
 
         for (Ghost gh : ghosts) {
             gh.player = this.player;
+            gh.map = this.map;
             addEntity(gh);
         }
     }
@@ -183,9 +186,8 @@ public class Window extends JFrame implements KeyListener {
                 pixelPerVerticalGrid
         );
 
-
         // set the player's pos through the map
-        player.setGridPos(spawnGrid);
+//        player.setGridPos();
         // setup the player hitbox
         Rect playerRect = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         // add some padding
@@ -194,7 +196,7 @@ public class Window extends JFrame implements KeyListener {
         player.setHitbox(playerRect);
         player.setMap(map);
         player.setWalls(walls);
-        player.setGridPos(spawn);
+//        player.setGridPos(spawn);
         player.setupImages("./img/pacman");
 
         // add as an entity to render
@@ -256,6 +258,9 @@ public class Window extends JFrame implements KeyListener {
         updateList(entities);
         updateList(walls);
         updateList(food);
+
+        map.clearGrid();
+        map.update(entities);
     }
 
     /**
@@ -365,6 +370,8 @@ public class Window extends JFrame implements KeyListener {
                     Wall e = new Wall(xPos, yPos, pixelPerHorizontalGrid, pixelPerVerticalGrid);
                     e.setHitbox(new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid));
                     walls.add(e);
+                    // set the base grid
+                    map.baseGrid[j][i] = 'W';
                 } else {
                     // setup food size
                     int foodWidth = pixelPerHorizontalGrid / 4;
@@ -413,6 +420,7 @@ public class Window extends JFrame implements KeyListener {
             case KeyEvent.VK_LEFT, KeyEvent.VK_A -> player.setWantedDirection('w');
             case KeyEvent.VK_UP , KeyEvent.VK_W-> player.setWantedDirection('n');
             case KeyEvent.VK_DOWN, KeyEvent.VK_S -> player.setWantedDirection('s');
+            case KeyEvent.VK_P -> System.out.println(map.toString());
             default -> {
             }
         }

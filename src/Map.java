@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * The Map class represents a grid-based structure used for mapping in the game.
  * It stores information about the layout of the game world, including characters at different positions.
@@ -8,6 +11,7 @@
 
 public class Map {
     private char[][] grid;
+    public char[][] baseGrid;
     public final int width, height;
 
     private Vector2[][] points;
@@ -30,6 +34,8 @@ public class Map {
         this.grid = new char[height][width];
         this.points = new Vector2[height][width];
         this.pixelPoints = new Vector2[height][width];
+
+        this.baseGrid = new char[height][width];
     }
 
     /**
@@ -54,6 +60,10 @@ public class Map {
             return ' ';
         }
         return grid[x][y];
+    }
+
+    public void set(char v, Vector2 pos) {
+        grid[(int) pos.x][(int) pos.y] = v;
     }
 
     /**
@@ -97,9 +107,11 @@ public class Map {
     @Override
     public String toString() {
         StringBuilder o = new StringBuilder();
-        for (char[] r : grid) {
+        for (char[] r : baseGrid) {
             for (char a : r) {
+                o.append("'");
                 o.append(a);
+                o.append("', ");
             }
             o.append("\n");
         }
@@ -119,5 +131,14 @@ public class Map {
 
     public void resetCount() {
         minDist = Double.MAX_VALUE;
+    }
+
+    public void clearGrid() {
+        for (char[] chars : grid) {
+            Arrays.fill(chars, ' ');
+        }
+    }
+
+    public void update(ArrayList<Entity> es) {
     }
 }

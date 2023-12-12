@@ -20,6 +20,7 @@ public class Wall extends Entity {
      */
     public Wall(int x, int y, int width, int height) {
         super(x, y, width, height);
+        mapChar = 'W';
         this.hitbox = new Rect(0, 0, width, height);
     }
 

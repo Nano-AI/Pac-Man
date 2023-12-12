@@ -17,7 +17,7 @@ public class Entity {
     private int width, height; // Width and height of the entity
     private Vector2 grid, gridSize; // Grid position and grid size of the entity
     private Vector2 direction; // Direction of the entity
-    private Vector2 gridPos; // Grid position of the entity
+    private Grid gridPos; // Grid position of the entity
 
     private BufferedImage[] images; // Array of images for the entity
 
@@ -29,6 +29,8 @@ public class Entity {
 
     // arraylist to keep track of grids
     public ArrayList<Grid> grids;
+
+    public char mapChar = ' ';
 
     /**
      * Get the array of images associated with this entity.
@@ -93,7 +95,6 @@ public class Entity {
      */
     public Entity(int x, int y, int gridX, int gridY, int width, int height) {
         this.pos = new Vector2(x, y);
-        this.gridPos = new Vector2(gridX, gridY);
         this.hitbox = new Rect(0, 0, width, height);
         this.width = width;
         this.height = height;
@@ -126,7 +127,7 @@ public class Entity {
      *
      * @param pos The new grid position.
      */
-    public void setGridPos(Vector2 pos) {
+    public void setGridPos(Grid pos) {
         this.gridPos = pos;
     }
 
@@ -318,23 +319,18 @@ public class Entity {
     public void updateGridSpot() {
         // store the min dist of the closest grid
         // iterate through all grids
-//        double minDist = Double.MAX_VALUE;
-        for (Entity w : grids) {
+        for (Grid w : grids) {
             // get the distance to the wall
             double d = distanceTo(w);
             // check if dist is less than min dist
-            if (Utils.inside(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
-//            if (d < minDist) {
-                // updatge
-                gridPos = w.getPos();
+            if (Utils.inRange(d, 0, Utils.pythag(getWidth(), getHeight()) / 2.0)) {
+                this.gridPos = w;
                 return;
-//                System.out.println();
-//                minDist = d;
             }
         }
     }
 
-    public Vector2 getGridPos() {
-        return this.gridPos.copy();
+    public Grid getGridPos() {
+        return this.gridPos;
     }
 }
