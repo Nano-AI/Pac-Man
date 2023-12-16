@@ -15,8 +15,6 @@ public class Grid extends Entity {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.GREEN);
-        g.drawRect(getX(), getY(), getWidth(), getHeight());
     }
 
     @Override

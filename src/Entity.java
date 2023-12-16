@@ -25,7 +25,7 @@ public class Entity {
 
     public Map m;
 
-    private int frameIndex = 0; // Index of the current frame for animation
+    public int frameIndex = 0; // Index of the current frame for animation
 
     // arraylist to keep track of grids
     public ArrayList<Grid> grids;
@@ -76,14 +76,17 @@ public class Entity {
      * Increment the frame index for animation and return the previous image.
      *
      * @return The BufferedImage of the previous frame.
-     */
-    public BufferedImage incrementFrameIndex() {
+     */    public BufferedImage incrementFrameIndex() {
         BufferedImage prev = getImage(frameIndex);
         frameIndex++;
         if (frameIndex >= images.length) {
             frameIndex = 0;
         }
         return prev;
+    }
+
+    public void setImages(BufferedImage[] i) {
+         this.images = i;
     }
 
     /**
@@ -278,6 +281,9 @@ public class Entity {
      * @param p The new direction vector.
      */
     public void setDirection(Vector2 p) {
+        if (p.x == 0 && p.y == 0) {
+            return;
+        }
         direction = p.normalize();
     }
 
@@ -420,17 +426,15 @@ public class Entity {
         this.collisions.clear();
         // I HAVE NO CLUE WHY GETTING SIZE AND DIVIDING BY 16 WORKS, BUT HEY, IT DOES!
         Entity c = getNextPosEntity((int) (getSize().x / 16), direction, 1);
-        boolean blocked = false;
 
         for (Entity wall : walls) {
             if (c.isIn(wall)) {
                 this.collisions.add(wall);
-                blocked = true;
-                break;
+                return true;
             }
         }
 
-        return blocked;
+        return false;
     }
 
     /**
@@ -469,6 +473,10 @@ public class Entity {
         wantedDirection = Utils.getDirection(direction);
     }
 
+    public void setWantedDirection(Vector2 direction) {
+        wantedDirection = direction;
+    }
+
     // TODO: Rewrite to use grid since function for grid positions now updates dynamically
     // TODO: replace instead of collisions
     public void moveInDirection(double deltaT) {
@@ -481,8 +489,10 @@ public class Entity {
         // if the new path isn't blocked AND it's not the opposite direction,
         // UNLESS we're blocked and one of the ways to go is the other way THEN, go the direction
         if (
-                ( !newPath && !wantedDirection.equals(getDirection().multiply(-1)) )
-                || ( samePath && wantedDirection.equals(getDirection().multiply(-1)) )
+                ( getDirection().x == 0 && getDirection().y == 0) ||
+                        !newPath
+//                ( !newPath && !wantedDirection.equals(getDirection().multiply(-1)) )
+//                || ( samePath && wantedDirection.equals(getDirection().multiply(-1)) )
         ) {
             Vector2 temp = getDirection();
             // go towards the wanted direction

@@ -2,11 +2,11 @@ import cv2
 import numpy as np
 import scipy.ndimage as scipy
 
-width = 31
-height = 15
+width = 21
+height = 21
 
 # Read the image
-img = cv2.imread('map.png')
+img = cv2.imread('Pac-Man.png')
 imgH, imgW, channels = img.shape
 
 boxW = int(imgW / width)

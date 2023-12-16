@@ -122,16 +122,28 @@ public class Window extends JFrame implements KeyListener {
         // get the pixel spot of spawn location
         Vector2 pixelSpot = map.getPoint((int) spawns.get(0).x, (int) spawns.get(0).y);
         // create a ghost at that position
-        Ghost g = new Ghost((int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        Ghost g = new Ghost("pinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.name = 'p';
+        g.mapChar = 'p';
+
+
+        Ghost b = new Ghost("blinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        b.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        b.name = 'b';
+        b.mapChar = 'b';
+
         ghosts.add(g);
+        ghosts.add(b);
+
+
 
         for (Ghost gh : ghosts) {
             gh.player = this.player;
 //            gh.map = this.map;
             gh.walls = walls;
             gh.updateMap(this.map);
+            gh.setupScatterPath();
             addEntity(gh);
         }
     }
@@ -189,7 +201,7 @@ public class Window extends JFrame implements KeyListener {
         player.setMap(map);
         player.setWalls(walls);
 //        player.setGridPos(spawn);
-        player.setupImages("./img/pacman");
+//        player.setupImages("./img/pacman");
 
         // add as an entity to render
         addEntity(player);

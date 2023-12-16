@@ -32,7 +32,7 @@ public class Main {
             // update the game based on delta
             window.update(delta);
             // render the game and disable hitbox outlines
-            window.render(true);
+            window.render(false);
         }
     }
 }

@@ -18,7 +18,12 @@ public class Player extends Entity {
     private double deltaAnimate = 0;
     private boolean blocked = false;
 
-    public Queue<Vector2> visited;
+    public ArrayList<Vector2> visited;
+
+    private BufferedImage[] rightFrames;
+    private BufferedImage[] leftFrames;
+    private BufferedImage[] upFrames;
+    private BufferedImage[] downFrames;
 
     /**
      * Constructor for the Player class with specified parameters.
@@ -32,8 +37,13 @@ public class Player extends Entity {
         super(x, y, width, height);
         mapChar = 'P';
 
-        visited = new LinkedList<>();
+        visited = new ArrayList<>();
         speed = 1.8;
+
+        rightFrames = Utils.getImages("./img/pacman-right");
+        leftFrames = Utils.getImages("./img/pacman-left");
+        upFrames = Utils.getImages("./img/pacman-up");
+        downFrames = Utils.getImages("./img/pacman-down");
     }
 
     /**
@@ -61,10 +71,14 @@ public class Player extends Entity {
      */
     @Override
     public void draw(Graphics g) {
+        for (Vector2 v : visited) {
+            g.setColor(Color.GREEN);
+            Vector2 p = m.getPoint((int) v.x, (int) v.y);
+            g.fillRect(
+                    (int) p.x, (int) p.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid
+            );
+        }
         drawImage(g);
-//        for (Grid w : grids) {
-//        }
-//        g.fillRect((int) getGridPos().getPos().x, (int) getGridPos().getPos().y, m.pixelPerHorizontalGrid, m.pixelPerHorizontalGrid);
     }
 
     /**
@@ -77,37 +91,36 @@ public class Player extends Entity {
         Graphics2D g2 = (Graphics2D) g;
         Vector2 p = getPos();
         Vector2 size = getSize();
-        Vector2 center = getCenter();
-        BufferedImage img = getImage();
-        // get the direction of the entity
-        int rotation = switch (Utils.getDirection(getDirection())) {
-            case 'n' -> 90;
-            case 'e' -> 180;
-            case 's' -> 270;
-            case 'w' -> 0;
-            default -> 0;
+
+        BufferedImage[] frames = switch (Utils.getDirection(getDirection())) {
+            case 'n' -> upFrames;
+            case 's' -> downFrames;
+            case 'w' -> leftFrames;
+            default -> rightFrames;
         };
 
-        // store the previous rotation
-        AffineTransform backup = g2.getTransform();
-        // set the rotation to those set degrees around the origin of center
-        AffineTransform a = AffineTransform.getRotateInstance(Math.toRadians(rotation), center.x, center.y);
+        setImages(frames);
 
-        // set the transform and draw image
-        g2.setTransform(a);
-        g2.drawImage(img, (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
-        // reset transform
-        g2.setTransform(backup);
+        g2.drawImage(getImage(), (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
     }
     
     private void addPath() {
-        if (visited.peek() == null) return;
-        if (!getGridPos().gridPos.equals(visited.peek())) {
-            visited.add(getGridPos().gridPos);
+        int last = visited.size() - 1;
+        if (visited.isEmpty() || visited.get(last) == null) {
+            if (getGridPos() != null)
+                visited.add(getGridPos().gridPos);
+            return;
         }
-        if (visited.size() > 15) {
-            visited.remove();
+        if (visited.size() > 20) {
+            visited.remove(last);
         }
+        if (!getGridPos().gridPos.equals(visited.get(0))) {
+            visited.add(0, getGridPos().gridPos);
+        }
+    }
+
+    public ArrayList<Vector2> getPath() {
+        return visited;
     }
 
     /**
@@ -119,7 +132,9 @@ public class Player extends Entity {
      */
     @Override
     public void update(double deltaT) {
-        addPath();
+        if (getGridPos() != null) {
+            addPath();
+        }
         // set the deltaT
         deltaAnimate += deltaT;
 

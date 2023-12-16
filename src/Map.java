@@ -1,6 +1,7 @@
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * The Map class represents a grid-based structure used for mapping in the game.
@@ -21,6 +22,8 @@ public class Map {
     private double minDist = Double.MAX_VALUE;
 
     public int pixelPerHorizontalGrid, pixelPerVerticalGrid;
+
+    public HashMap<Character, ArrayList<Vector2>> scatterPaths;
 
     /**
      * Constructor for the Map class with specified width and height.
@@ -49,6 +52,7 @@ public class Map {
      * @return The character at the specified position.
      */
     public char at(Vector2 v) {
+        if (!valid(v)) return 'W';
         return at((int) v.x, (int) v.y);
     }
 
@@ -107,6 +111,10 @@ public class Map {
         return points[x][y];
     }
 
+    public Vector2 getPoint(Vector2 v) {
+        return getPoint((int) v.x, (int) v.y);
+    }
+
     /**
      * Override of the toString method to represent the map as a string.
      *
@@ -163,17 +171,39 @@ public class Map {
         }
     }
 
+    public boolean valid(Vector2 v) {
+        return v.x >= 0 && v.x < height && v.y >= 0 && v.y < width;
+    }
+
+    public boolean moveable(Vector2 v) {
+        return at(v) != 'W' && valid(v);
+    }
+
     public ArrayList<Vector2> getNeighbors(Vector2 pos) {
         ArrayList<Vector2> o = new ArrayList<>();
 
-        for (char c : Utils.cardinalDirections) {
-            Vector2 d = Utils.getDirection(c);
-            System.out.println(at(pos.add(Utils.getDirection(c))));
-            if (at(pos.add(Utils.getDirection(c))) != 'W') {
-                o.add(d);
+        for (Vector2 c : Utils.getDirections()) {
+            Vector2 cpy = pos.copy().add(c);
+            if (baseGrid[(int) cpy.x][(int) cpy.y] == ' ') {
+                o.add(c);
             }
         }
 
         return o;
+    }
+
+    public void printNeighbors(Vector2 pos) {
+        for (int i = -1; i <= 1; i++) {
+            if (pos.x + i < 0 || pos.x + i > height) {
+                continue;
+            }
+            for (int j = -1; j <= 1; j++) {
+                if (pos.y + j < 0 || pos.y + j > width) {
+                    continue;
+                }
+                System.out.print(at((int) (pos.x + j), (int) (pos.y + i)));
+            }
+            System.out.println();
+        }
     }
 }

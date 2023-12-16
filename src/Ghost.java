@@ -8,10 +8,8 @@
 import javax.management.QueryEval;
 import java.awt.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
+import java.util.List;
 
 public class Ghost extends Entity {
     private Vector2 nextPos;
@@ -19,61 +17,148 @@ public class Ghost extends Entity {
     public Map map;
     double detectionRadius;
     public char name = 'r';
+    private double pathUpdate = 0;
+
+    private ArrayList<Vector2> scatterPath;
 
     PathFinder finder;
 
-    Queue<Vector2> path;
+    Queue<Vector2> sortedPath;
 
     private double randomT = 0;
 
-    public Ghost(int x, int y, int gridX, int gridY, int width, int height) {
+    ArrayList<Vector2> findPath;
+    private double chaseSpeed;
+    private double baseSpeed;
+
+    private LList<Vector2> sortedScatterPath;
+
+    public Ghost(String name, int x, int y, int gridX, int gridY, int width, int height) {
         super(x, y, gridX, gridY, width, height);
         System.out.println(getWidth() + " " + getHeight());
-        setupImages("./img/ghost");
+        setupImages("./img/ghosts/" + name);
         mapChar = 'p';
 
         this.detectionRadius = 120f;
 
-        path = new LinkedList<>();
+        sortedPath = new LinkedList<>();
+
+        blocked = true;
+        baseSpeed = 1.75;
+        speed = baseSpeed;
+        chaseSpeed = 1.05 * speed;
+    }
+
+    public void setupScatterPath() {
+        scatterPath = new ArrayList<>();
+        char c = Character.toLowerCase(mapChar);
+        for (int i = 0; i < map.height; i++) {
+            for (int j = 0; j < map.width; j++) {
+                if (map.at(i, j) == c) {
+                    scatterPath.add(new Vector2(i, j));
+                }
+            }
+        }
+
+        sortedScatterPath = new LList<Vector2>();
+        sortedScatterPath.head = new Node<>(scatterPath.get(0).copy());
+        scatterPath.remove(0);
+        Node<Vector2> head = sortedScatterPath.head;
+
+        int i = 0;
+        while (i < scatterPath.size()) {
+            System.out.println(scatterPath.get(i).distanceTo(head.val).getMagnitude());
+            if (scatterPath.get(i).distanceTo(head.val).getMagnitude() == 1f) {
+                head.next = new Node<>(scatterPath.get(i));
+                head = head.next;
+                scatterPath.remove(i);
+                i = 0;
+            } else {
+                i++;
+            }
+        }
+
     }
 
     @Override
     public void update(double deltaT) {
-//        if (getDistanceTo(player) < detectionRadius) {
-//            addPos(player.getVectorDistance(this).multiply(0.05 * deltaT));
-//        }
         randomT += deltaT;
         updateGridSpot();
         move(deltaT);
-        speed = 1.75;
-//        finder.solve(this.getGridPos().gridPos, player.getGridPos().gridPos);
-//        System.out.println(finder.toString());
+
+        pathUpdate += deltaT;
     }
 
     public void move(double deltaT) {
         switch (name) {
-            case 'r':
-                moveChase();
+            case 'b':
+                moveChase(deltaT);
                 break;
             default:
                 moveRandom(deltaT);
         }
     }
 
-    private void moveChase() {
+    private void moveChase(double deltaT) {
+        if (canSee(player)) {
+            speed = chaseSpeed;
+        } else {
+            speed = baseSpeed;
+        }
+        if (getDistanceTo(player) < detectionRadius && pathUpdate > 50) {
+        } else {
+            moveRandom(deltaT);
+        }
+    }
 
+    private boolean canSee(Entity e) {
+        for (Vector2 v : getSightLine()) {
+            if (e.getGridPos().gridPos.equals(v)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<Vector2> getSightLine() {
+        ArrayList<Vector2> sight = new ArrayList<>();
+
+        // get x values to the right
+        for (int x = -1; x <= 1; x+= 1) {
+            for (int y = -1; y <= 1; y += 1) {
+                if (x == 0 && y == 0) continue;
+                Vector2 g = getGridPos().gridPos.copy();
+                while (map.moveable(g)) {
+                    sight.add(g.copy());
+                    g.add(x, y);
+                }
+            }
+        }
+
+        return sight;
     }
 
     private void moveRandom(double deltaT) {
-        if (randomT > Math.random() * 10 || blocked) {
-            ArrayList<Vector2> spots = map.getNeighbors(getGridPos().gridPos);
-            System.out.println(spots);
-            Vector2 dir;
-            int rand = (int) (Math.random() * spots.size());
-            dir = spots.get(rand);
-            spots.forEach(i -> {System.out.print(Utils.getDirection(i));});
-            System.out.println();
-            setWantedDirection(Utils.getDirection(dir));
+        if (randomT > Math.random() * 1000 || blocked) {
+            ArrayList<Vector2> spots = new ArrayList<>();
+            Vector2[] neighbors = Utils.getDirections();
+//            System.out.println(getGridPos().gridPos);
+//            for (Vector2 c : neighbors) {
+//                if (!c.multiply(-1).equals(getDirection().swap())) {
+//                    spots.add(c);
+//                }
+//            }
+//            if (spots.isEmpty()) {
+//                spots.addAll(
+//                        map.getNeighbors(getGridPos().gridPos)
+//                );
+//            }
+//            int rand = (int) (Math.random() * spots.size());
+            // swap because matrix coordinates are width, height BUT
+            // graphical coordinates are x then y
+            // this means that they MUST be swapped in order for it to work
+            int rand = (int) (Math.random() * neighbors.length);
+            setWantedDirection(neighbors[rand]);
             randomT = 0;
         }
         moveInDirection(deltaT);
@@ -81,7 +166,7 @@ public class Ghost extends Entity {
 
     public void updateMap(Map m) {
         this.map = m;
-        finder = new PathFinder(this.map.baseGrid);
+//        finder = new PathFinder(this.map.baseGrid);
     }
 
     @Override
@@ -90,72 +175,21 @@ public class Ghost extends Entity {
         Vector2 p = getPos();
         Vector2 size = getSize();
 
-        g.setColor(Color.green);
-        g2.fillRect((int) getGridPos().getX(), (int) getGridPos().getY(), getWidth(), getHeight());
-        g2.drawRect(getX(), getY(), getWidth(), getHeight());
+        Node<Vector2> head = sortedScatterPath.head;
+        while (head.next != null) {
+            Vector2 v1 = map.getPoint(head.val);
+            Vector2 v2 = map.getPoint(head.next.val);
+            g2.drawLine(
+                    (int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y
+            );
+            head = head.next;
+        }
         g2.drawImage(getImage(), (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
 
-//        ArrayList<Entity> path = getPathTo(player);
-//        for (int i = 0; i < path.size() - 1; i++) {
-//            g.drawLine(path.get(i).getX(), path.get(i).getY(), path.get(i + 1).getX(), path.get(i + 1).getY());
-//        }
+        if (findPath != null)
+            for (Vector2 v : findPath) {
+                g2.setColor(Color.RED);
+                g2.fillRect((int) v.x, (int) v.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
+            }
     }
-
-//    private ArrayList<Vector2> getPathTo(Entity e) {
-//        ArrayList<Vector2> path = new ArrayList<>();
-//        char[][] reached = this.map.baseGrid.clone();
-//
-//        Queue<Vector2> frontier = new LinkedList<>();
-//        frontier.add(getGridPos().gridPos);
-//        reached[getGridPos().getX()][getGridPos().getY()] = 'S';
-//
-//        Vector2 current;
-//
-//        while (frontier.size() > 0) {
-//            current = frontier.poll();
-//            // https://theory.stanford.edu/~amitp/GameProgramming/AStarComparison.html
-//            for (Vector2 next : getNeighbors(current, reached)) {
-//                for (Vector2 item : frontier) {
-//                    if (isIn(item, frontier)) {
-//                        frontier.add(next);
-//                        m[next.x][next.y] = 'R';
-//                    }
-//                }
-//            }
-//        }
-//
-//        return path;
-//    }
-//
-//    private boolean isIn(Vector2 v, Queue q) {
-//        for (Object i : q) {
-//            if (((Vector2) i).equals(v)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-//
-//    private ArrayList<Vector2> getNeighbors(Vector2 pos, char[][] m) {
-//        int x = (int) pos.x;
-//        int y = (int) pos.y;
-//        ArrayList<Vector2> o = new ArrayList<>();
-//        if (x > 1) {
-//            o.add(new Vector2(x - 1, y));
-//        }
-//
-//        if (x < m.length - 2) {
-//            o.add(new Vector2(x + 1, y));
-//        }
-//
-//        if (y > 1) {
-//            o.add(new Vector2(x, y - 1));
-//        }
-//
-//        if (y < m[0].length - 2) {
-//            o.add(new Vector2(x, y - 1));
-//        }
-//
-//        return o;
-//    }
 }

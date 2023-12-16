@@ -10,15 +10,22 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Utils {
     public static char[] cardinalDirections = new char[]{'n', 'e', 's', 'w'};
-    public static Vector2[] directions = new Vector2[]{
-            new Vector2(0, -1),
-            new Vector2(1, 0),
-            new Vector2(0, 1),
-            new Vector2(-1, 0)
-    };
+
+    public static Vector2[] getDirections() {
+        return new Vector2[]{
+                new Vector2(0, -1),
+                new Vector2(1, 0),
+                new Vector2(0, 1),
+                new Vector2(-1, 0)
+        };
+    }
 
     /**
      * Clamp a value within a specified range.
@@ -120,6 +127,7 @@ public class Utils {
         File dir = new File(folder);
         File[] listing = dir.listFiles();
 
+        System.out.println(folder);
         assert listing != null;
         BufferedImage[] o = new BufferedImage[listing.length];
 

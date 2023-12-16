@@ -68,6 +68,10 @@ public class Vector2 {
         return this;
     }
 
+    public Vector2 add(int x, int y) {
+        return add(new Vector2(x, y));
+    }
+
     /**
      * Normalize the vector, i.e., convert it to a unit vector.
      *
@@ -111,6 +115,10 @@ public class Vector2 {
         return x == v.x && y == v.y;
     }
 
+    public boolean equals(double x, double y) {
+        return this.x == x && this.y == y;
+    }
+
     /**
      * Check if the vector is within the boundaries of an entity.
      *
@@ -141,5 +149,11 @@ public class Vector2 {
 
     public Vector2 swap() {
         return new Vector2(y, x);
+    }
+
+    public double getMagnitude() {
+        return Utils.pythag(
+                x, y
+        );
     }
 }
