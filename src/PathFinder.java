@@ -1,6 +1,19 @@
-import java.util.Arrays;
+import java.util.*;
 
-public class PathFinder implements Runnable {
+public class PathFinder {
+    private class Node {
+        Vector2 pos;
+        int gCost;
+        int hCost;
+        Node parent;
+
+        public Node(Vector2 pos) {
+            this.pos = pos;
+            this.gCost = 0;
+            this.hCost = 0;
+            this.parent = null;
+        }
+    }
     final static char TRIED = 'T';
     final static char PATH = 'P';
     final static char OPEN = ' ';
@@ -11,6 +24,8 @@ public class PathFinder implements Runnable {
 
     private Vector2 start;
     private Vector2 end;
+
+    Queue<Vector2> path;
     public PathFinder(char[][] grid) {
         this.grid = grid;
         this.width = grid[0].length;
@@ -21,48 +36,89 @@ public class PathFinder implements Runnable {
         for (char[] c : this.grid) {
             System.out.println(Arrays.toString(c));
         }
+        path = new LinkedList<Vector2>();
     }
 
-    public void solve(Vector2 start, Vector2 end) {
-        this.start = start;
-        this.end = end;
+    /**
+     * Uses the A* path finding algo to locate where to go
+     * @param start The start location
+     * @param goal The eventual end goal to go towards
+     * @return A Queue telling directions in order
+     */
+    public Queue<Vector2> findPath(Vector2 start, Vector2 goal) {
+        PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(node -> node.gCost + node.hCost));
+        Set<Vector2> closedSet = new HashSet<>();
 
-        traverse((int) start.x, (int) start.y);
+        Node startNode = new Node(start);
+        Node endNode = new Node(goal);
+
+        openSet.add(startNode);
+
+        while (!openSet.isEmpty()) {
+            Node currentNode = openSet.poll();
+
+            if (currentNode.pos.equals(endNode.pos)) {
+                return reconstructPath(currentNode);
+            }
+
+            closedSet.add(currentNode.pos);
+
+            for (Vector2 n : getNeighbors(currentNode.pos)) {
+                if (closedSet.contains(n)) {
+                    continue;
+                }
+
+                int tenativeGCost = currentNode.gCost + 1;
+
+                Node neighborNode = new Node(n);
+                neighborNode.gCost = tenativeGCost;
+                neighborNode.hCost = (int) heuristic(n, goal);
+                neighborNode.parent = currentNode;
+
+                if (!openSet.contains(neighborNode) || tenativeGCost < neighborNode.gCost) {
+                    openSet.add(neighborNode);
+                }
+            }
+        }
+
+        return null;
     }
 
-    private boolean traverse(int i, int j) {
-        if (!isValid(i, j)) {
-            return false;
+    private Queue<Vector2> reconstructPath(Node node) {
+        Queue<Vector2> path = new LinkedList<>();
+
+        while (node != null) {
+            path.add(node.pos);
+            node = node.parent;
         }
 
-        if (isEnd(i, j)) {
-            map[i][j] = PATH;
-            return true;
-        } else {
-            map[i][j] = TRIED;
-        }
+        Collections.reverse((List<?>) path);
+        return path;
+    }
 
-        if (traverse(i - 1, j)) {
-            map[i - 1][j] = PATH;
-            return true;
+    private ArrayList<Vector2> getNeighbors(Vector2 pos) {
+        ArrayList<Vector2> neighbors = new ArrayList<>();
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Vector2 newPos = pos.copy().add(i, j);
+                if (Math.abs(i) != Math.abs(j) && isValid(newPos) && isOpen(newPos)) {
+                    neighbors.add(newPos);
+                }
+            }
         }
+        return neighbors;
+    }
 
-        if (traverse(i, j + 1)) {
-            map[i][j + 1] = PATH;
-            return true;
-        }
+    private double heuristic(Vector2 a, Vector2 b) {
+        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    }
 
-        if (traverse(i + 1, j)) {
-            map[i + 1][j] = PATH;
-            return true;
-        }
+    private boolean isValid(Vector2 v) {
+        return isValid((int) v.x, (int) v.y);
+    }
 
-        if (traverse(i, j - 1)) {
-            map[i][j - 1] = PATH;
-            return true;
-        }
-
-        return false;
+    private boolean isOpen(Vector2 v) {
+        return isOpen((int) v.x, (int) v.y);
     }
 
     private boolean isEnd(int i, int j) {
@@ -99,9 +155,5 @@ public class PathFinder implements Runnable {
             s.append(Arrays.toString(row)).append("\n");
         }
         return s.toString();
-    }
-
-    @Override
-    public void run() {
     }
 }

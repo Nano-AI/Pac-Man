@@ -38,7 +38,7 @@ public class Entity {
     public ArrayList<Entity> collisions;
     public ArrayList<Entity> walls;
     public Vector2 nextGridPos;
-    public Vector2 wantedDirection;
+    private Vector2 wantedDirection;
 
     public boolean blocked;
 
@@ -474,6 +474,7 @@ public class Entity {
     }
 
     public void setWantedDirection(Vector2 direction) {
+        if (direction.x == 0 && direction.y == 0) return;
         wantedDirection = direction;
     }
 
