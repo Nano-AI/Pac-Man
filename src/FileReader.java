@@ -56,6 +56,8 @@ public class FileReader {
             System.out.println(Arrays.toString(l));
         }
 
+        m.setupEmptySpots();
+
         return m;
     }
 }

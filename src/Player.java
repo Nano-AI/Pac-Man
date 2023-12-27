@@ -25,6 +25,7 @@ public class Player extends Entity {
     private BufferedImage[] upFrames;
     private BufferedImage[] downFrames;
 
+    public boolean dead = false;
     /**
      * Constructor for the Player class with specified parameters.
      *
@@ -38,12 +39,14 @@ public class Player extends Entity {
         mapChar = 'P';
 
         visited = new ArrayList<>();
-        speed = 1.8;
+        speed = 2.0;
 
         rightFrames = Utils.getImages("./img/pacman-right");
         leftFrames = Utils.getImages("./img/pacman-left");
         upFrames = Utils.getImages("./img/pacman-up");
         downFrames = Utils.getImages("./img/pacman-down");
+
+        setDirection('e');
     }
 
     /**
@@ -71,13 +74,14 @@ public class Player extends Entity {
      */
     @Override
     public void draw(Graphics g) {
-        for (Vector2 v : visited) {
-            g.setColor(Color.GREEN);
-            Vector2 p = m.getPoint((int) v.x, (int) v.y);
-            g.fillRect(
-                    (int) p.x, (int) p.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid
-            );
-        }
+        // draw the spots the pacman has been in
+//        for (Vector2 v : visited) {
+//            g.setColor(Color.GREEN);
+//            Vector2 p = m.getPoint((int) v.x, (int) v.y);
+//            g.fillRect(
+//                    (int) p.x, (int) p.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid
+//            );
+//        }
         drawImage(g);
     }
 
@@ -132,9 +136,11 @@ public class Player extends Entity {
      */
     @Override
     public void update(double deltaT) {
-        if (getGridPos() != null) {
-            addPath();
-        }
+        // add the history of path to pacman
+        // unused for now
+//        if (getGridPos() != null) {
+//            addPath();
+//        }
         // set the deltaT
         deltaAnimate += deltaT;
 
@@ -143,10 +149,18 @@ public class Player extends Entity {
         // animate every 5 (forgot units ms), and make sure it's not blocekd and moving
         if (deltaAnimate >= 5 && !blocked) {
             incrementFrameIndex();
+            getAudioPlayer().playSound("gs_siren_soft");
             deltaAnimate = 0;
         }
 
         // update the grid spot at which the player is currently at
         updateGridSpot();
+    }
+
+    public void gameOver() {
+
+    }
+
+    public void playDead() {
     }
 }

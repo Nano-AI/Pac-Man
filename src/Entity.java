@@ -43,6 +43,11 @@ public class Entity {
     public boolean blocked;
 
     public double speed;
+    private AudioPlayer audioPlayer;
+
+    public void setAudioPlayer(AudioPlayer player) {
+        this.audioPlayer = player;
+    }
 
     /**
      * Get the array of images associated with this entity.
@@ -478,9 +483,16 @@ public class Entity {
         wantedDirection = direction;
     }
 
+    public AudioPlayer getAudioPlayer() {
+        return this.audioPlayer;
+    }
+
     // TODO: Rewrite to use grid since function for grid positions now updates dynamically
     // TODO: replace instead of collisions
     public void moveInDirection(double deltaT) {
+        if (!audioPlayer.isSoundDone("gs_start")) {
+            return;
+        }
         // check if the wanted direction's path is blocked
         boolean newPath = nextIsBlocked(wantedDirection, deltaT);
         // check if the current direction's path is blocked

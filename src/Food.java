@@ -49,6 +49,7 @@ public class Food extends Entity {
     public void update(double deltaT) {
         if (isTouching(player) && !eaten) {
             counter.addEaten();
+            getAudioPlayer().playSound("gs_chomp");
             eaten = true;
         }
     }

@@ -25,6 +25,8 @@ public class Map {
 
     public HashMap<Character, ArrayList<Vector2>> scatterPaths;
 
+    private ArrayList<Vector2> emptySpaces;
+
     /**
      * Constructor for the Map class with specified width and height.
      *
@@ -134,8 +136,8 @@ public class Map {
         return o.toString();
     }
 
-    public Vector2 getRandomGridSpot() {
-        ArrayList<Vector2> emptySpaces = new ArrayList<>();
+    public void setupEmptySpots() {
+        emptySpaces = new ArrayList<>();
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (at(i, j) == '.') {
@@ -143,11 +145,12 @@ public class Map {
                 }
             }
         }
+    }
 
+    public Vector2 getRandomGridSpot() {
         // get a random empty position on the map
         // this is in terms of array coordintes
-        Vector2 spawnGrid = emptySpaces.get((int) (Math.random() * emptySpaces.size()));
-        return spawnGrid;
+        return emptySpaces.get((int) (Math.random() * emptySpaces.size()));
     }
 
     public void updatePlayerPos(Vector2 pos, double minDist) {
@@ -181,14 +184,12 @@ public class Map {
 
     public ArrayList<Vector2> getNeighbors(Vector2 pos) {
         ArrayList<Vector2> o = new ArrayList<>();
-
         for (Vector2 c : Utils.getDirections()) {
             Vector2 cpy = pos.copy().add(c);
             if (baseGrid[(int) cpy.x][(int) cpy.y] == ' ') {
                 o.add(c);
             }
         }
-
         return o;
     }
 

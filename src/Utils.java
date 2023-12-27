@@ -105,16 +105,21 @@ public class Utils {
         int x = 0;
         int y = 0;
         switch (Character.toLowerCase(d)) {
-            case 'n', 'u' -> y = -1;
-            case 'e', 'r' -> x = 1;
-            case 's', 'd' -> y = 1;
-            case 'w', 'l' -> x = -1;
+            case 'n', 'u' -> y = -1; // { 0, -1 }
+            case 'e', 'r' -> x = 1; // { 1, 0 }
+            case 's', 'd' -> y = 1; // { 0, 1 }
+            case 'w', 'l' -> x = -1; // { -1, 0 }
             case '0' -> x = 0;
             default -> {
                 return new Vector2(0, 0);
             }
         }
         return new Vector2(x, y);
+    }
+
+    public static File[] getFiles(String folder) {
+        File dir = new File(folder);
+        return dir.listFiles();
     }
 
     /**
@@ -124,8 +129,7 @@ public class Utils {
      * @return An array of BufferedImage objects representing the images.
      */
     public static BufferedImage[] getImages(String folder) {
-        File dir = new File(folder);
-        File[] listing = dir.listFiles();
+        File[] listing = getFiles(folder);
 
         System.out.println(folder);
         assert listing != null;

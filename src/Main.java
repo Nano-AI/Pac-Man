@@ -17,7 +17,7 @@ public class Main {
         final long OPTIMAL_TIME = 1_000_000_000 / TARGET_FPS;
 
         // game loop
-        while (running) {
+        while (window.running) {
             // calculate delta-T (time since last frame)
             long now = System.nanoTime();
             long updateTime = now - lastLoopTime;

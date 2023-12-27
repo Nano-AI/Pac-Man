@@ -11,6 +11,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 public class Window extends JFrame implements KeyListener {
+    public boolean running = true;
     // keep track of the map as its own class
     private Map map;
     // arraylist/variables of things to render and objects in the game
@@ -26,6 +27,7 @@ public class Window extends JFrame implements KeyListener {
     private double deltaT;
     private Image bufferImage;
     private Graphics2D buffer;
+    public AudioPlayer audioPlayer;
 
     /**
      * Constructor of the Window class.
@@ -41,6 +43,9 @@ public class Window extends JFrame implements KeyListener {
         food = new ArrayList<>();
         ghosts = new ArrayList<>();
         grids = new ArrayList<>();
+
+        this.audioPlayer = new AudioPlayer("./sounds");
+        this.audioPlayer.playSound("gs_start");
 
         // set title
         setTitle(title);
@@ -64,6 +69,12 @@ public class Window extends JFrame implements KeyListener {
         addKeyListener(this);
     }
 
+    private void playStartScreen() {
+        this.audioPlayer.playSound("gs_start");
+        while (!audioPlayer.isSoundDone("gs_start")) {
+        }
+    }
+
     /**
      * Sets up all the different entities in teh game
      * @see Entity
@@ -80,6 +91,7 @@ public class Window extends JFrame implements KeyListener {
         // TODO: might have to remove this
         for (Entity e : entities) {
             e.setGridSize(new Vector2(pixelPerHorizontalGrid, pixelPerVerticalGrid));
+            e.setAudioPlayer(audioPlayer);
         }
     }
 
@@ -170,6 +182,7 @@ public class Window extends JFrame implements KeyListener {
         for (Entity f : food) {
             ((Food) f).player = player;
             ((Food) f).counter = statsCounter;
+            entities.add(f);
         }
     }
 
@@ -200,6 +213,7 @@ public class Window extends JFrame implements KeyListener {
         player.setHitbox(playerRect);
         player.setMap(map);
         player.setWalls(walls);
+        player.setAudioPlayer(this.audioPlayer);
 //        player.setGridPos(spawn);
 //        player.setupImages("./img/pacman");
 
@@ -228,7 +242,7 @@ public class Window extends JFrame implements KeyListener {
         // exit on close
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         // set size
-        setPreferredSize(new Dimension(800, 800));
+        setPreferredSize(new Dimension(700, 700));
         // add everything
         pack();
         // make it visible
@@ -267,8 +281,7 @@ public class Window extends JFrame implements KeyListener {
     }
 
     private void updateMap() {
-        for (Entity e : entities) {
-        }
+
     }
 
     /**

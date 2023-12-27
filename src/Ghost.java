@@ -28,7 +28,7 @@ public class Ghost extends Entity {
     Queue<Vector2> supposedPath;
 
     // render update time or smth idk
-    private double randomT = 0;
+    private double totalScatterTime = 0;
     // path to player
     ArrayList<Vector2> findPath;
     // chase speed of ghost
@@ -43,6 +43,7 @@ public class Ghost extends Entity {
 
     // path find to player or some other stuff
     private PathFinder finder;
+    private double randomT = 0;
 
     /**
      * Default constructor for the ghost
@@ -69,7 +70,8 @@ public class Ghost extends Entity {
         blocked = true;
         baseSpeed = 1.75;
         speed = baseSpeed;
-        chaseSpeed = 1.05 * speed;
+//        chaseSpeed = 1.1 * speed;
+        chaseSpeed = 1.99;
     }
 
     /**
@@ -115,15 +117,18 @@ public class Ghost extends Entity {
 
     @Override
     public void update(double deltaT) {
+//        if (getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
+//            player.dead = true;
+//        }
+
         randomT += deltaT;
         updateGridSpot();
         move(deltaT);
-
         pathUpdate += deltaT;
     }
 
     public void move(double deltaT) {
-        if (!canSee(player)) {
+        if (!canSee(player) && totalScatterTime < 7) {
             moveScatter(deltaT);
             return;
         }
@@ -152,6 +157,7 @@ public class Ghost extends Entity {
                 // set to scatter mode
                 scatterMode = true;
             } else {
+                totalScatterTime += deltaT;
                 // check if we are on the same grid pos so we can update it
                 if (getGridPos().gridPos.equals(sortedScatterPath.iterate.val)) {
                     // make sure to loop throuhg it and make sure that it goes back to the head
@@ -199,13 +205,38 @@ public class Ghost extends Entity {
      * @param deltaT
      */
     private void moveChase(double deltaT) {
-        if (canSee(player)) {
+        boolean see = canSee(player);
+        if (see) {
             speed = chaseSpeed;
             scatterMode = false;
+            supposedPath.clear();
         } else {
             speed = baseSpeed;
             scatterMode = true;
         }
+
+        if (supposedPath.size() <= 1) {
+            supposedPath = finder.findPath(this.getGridPos().gridPos, player.getGridPos().gridPos);
+            if (supposedPath == null) return;
+            supposedPath.poll();
+            if (supposedPath.isEmpty()) {
+                System.out.println("CAUGHT");
+                return;
+            }
+        }
+        if (getGridPos().gridPos.equals(supposedPath.peek())) {
+            supposedPath.poll();
+        }
+        // go towards the grid pos by finding the distance between the current and next,
+        // normalizing it, then setting the direction
+        Vector2 goTo = getGridPos().gridPos.distanceTo(supposedPath.peek()).normalize();
+        // pixel coordinates: (x, y) and go left to right, then top to bottom increments
+        // grid coordinates: (y, x) and go up to down, then left to right
+        // so in order to go in the correct direction we have to swap and mulitply by -1
+        setWantedDirection(
+                goTo.swap().multiply(-1)
+        );
+        moveInDirection(deltaT);
     }
 
     /**
@@ -248,28 +279,19 @@ public class Ghost extends Entity {
     }
 
     private void moveRandom(double deltaT) {
-        if (randomT > Math.random() * 1000 || blocked) {
-            ArrayList<Vector2> spots = new ArrayList<>();
-            Vector2[] neighbors = Utils.getDirections();
-//            System.out.println(getGridPos().gridPos);
-//            for (Vector2 c : neighbors) {
-//                if (!c.multiply(-1).equals(getDirection().swap())) {
-//                    spots.add(c);
-//                }
-//            }
-//            if (spots.isEmpty()) {
-//                spots.addAll(
-//                        map.getNeighbors(getGridPos().gridPos)
-//                );
-//            }
-//            int rand = (int) (Math.random() * spots.size());
-            // swap because matrix coordinates are width, height BUT
-            // graphical coordinates are x then y
-            // this means that they MUST be swapped in order for it to work
-            int rand = (int) (Math.random() * neighbors.length);
-//            setWantedDirection(neighbors[rand]);
-            randomT = 0;
+        // TODO: dude idk fix it later
+        ArrayList<Vector2> pos = map.getNeighbors(getGridPos().gridPos);
+        Vector2 currentDir = getDirection();
+        Vector2 dir = pos.get(0).swap();
+        for (int i = 0; i < pos.size(); i++) {
+            if (pos.get(i).swap().multiply(-1).equals(currentDir)) {
+                pos.remove(i);
+                break;
+            }
         }
+        if (!pos.isEmpty()) dir = pos.get((int) (Math.random() * pos.size())).swap();
+
+        setWantedDirection(dir);
         moveInDirection(deltaT);
     }
 
@@ -285,27 +307,33 @@ public class Ghost extends Entity {
         Vector2 p = getPos();
         Vector2 size = getSize();
 
-        Node<Vector2> head = sortedScatterPath.head;
-        while (head.next != null) {
-            Vector2 v1 = map.getPoint(head.val);
-            Vector2 v2 = map.getPoint(head.next.val);
-            g2.drawLine(
-                    (int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y
-            );
-            head = head.next;
-        }
+        // coloring the scatter path
+//        Node<Vector2> head = sortedScatterPath.head;
+//        while (head.next != null) {
+//            Vector2 v1 = map.getPoint(head.val);
+//            Vector2 v2 = map.getPoint(head.next.val);
+//            g2.drawLine(
+//                    (int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y
+//            );
+//            head = head.next;
+//        }
 
-        for (Vector2 v : supposedPath) {
-            Vector2 pFind = map.getPoint(v);
-            g2.fillRect((int) pFind.x, (int) pFind.y, map.pixelPerHorizontalGrid, map.pixelPerHorizontalGrid);
-        }
+        // outlining the path the ghost should go on
+//        for (Vector2 v : supposedPath) {
+//            Vector2 pFind = map.getPoint(v);
+//            g2.fillRect((int) pFind.x, (int) pFind.y, map.pixelPerHorizontalGrid, map.pixelPerHorizontalGrid);
+//        }
 
+//        for (Vector2 v : map.getNeighbors(getGridPos().gridPos)) {
+//            v = v.swap();
+//            g2.fillRect((int) (getX() + v.x * map.pixelPerVerticalGrid), (int) (getY() + v.y * map.pixelPerVerticalGrid), map.pixelPerHorizontalGrid, map.pixelPerHorizontalGrid);
+//        }
         g2.drawImage(getImage(), (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
 
-        if (findPath != null)
-            for (Vector2 v : findPath) {
-                g2.setColor(Color.RED);
-                g2.fillRect((int) v.x, (int) v.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
-            }
+//        if (findPath != null)
+//            for (Vector2 v : findPath) {
+//                g2.setColor(Color.RED);
+//                g2.fillRect((int) v.x, (int) v.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
+//            }
     }
 }

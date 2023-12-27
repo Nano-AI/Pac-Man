@@ -46,6 +46,7 @@ public class PathFinder {
      * @return A Queue telling directions in order
      */
     public Queue<Vector2> findPath(Vector2 start, Vector2 goal) {
+        if (start == null || goal == null) return new LinkedList<>();
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingInt(node -> node.gCost + node.hCost));
         Set<Vector2> closedSet = new HashSet<>();
 
@@ -54,8 +55,14 @@ public class PathFinder {
 
         openSet.add(startNode);
 
+        int iterations = 0;
+
         while (!openSet.isEmpty()) {
             Node currentNode = openSet.poll();
+            iterations++;
+            if (iterations > Math.pow(map.length, 3)) {
+                return reconstructPath(currentNode);
+            }
 
             if (currentNode.pos.equals(endNode.pos)) {
                 return reconstructPath(currentNode);
