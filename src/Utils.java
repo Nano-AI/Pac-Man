@@ -7,6 +7,7 @@
  */
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -72,9 +73,20 @@ public class Utils {
      * @return True if the value is within the range, false otherwise.
      */
     public static boolean withinRange(double value, double equal, double percent) {
-//        System.out.println(Math.abs((value - equal) / value));
         return Math.abs((value - equal) / (value)) <= percent;
-//        return value * (1 - percent) <= equal && value * (1 + percent) >= equal;
+    }
+
+    public static BufferedImage removeColor(BufferedImage image, Color target, double threshold) {
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        float[] targetColorHSB = Color.RGBtoHSB(target.getRed(), target.getGreen(), target.getBlue(), null);
+        for (int x = 0; x < image.getWidth(); x++) {
+            for (int y = 0; y < image.getHeight(); y++) {
+                int pixel = image.getRGB(x, y);
+                Color pixelColor = new Color(pixel);
+                // TODO: Could implement it if not lazy, but seems redundant and waste of code
+            }
+        }
+        return newImage;
     }
 
     /**

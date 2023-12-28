@@ -94,6 +94,8 @@ public class Window extends JFrame implements KeyListener {
         for (Entity e : entities) {
             e.setGridSize(new Vector2(pixelPerHorizontalGrid, pixelPerVerticalGrid));
             e.setAudioPlayer(audioPlayer);
+            e.setStatsCounter(statsCounter);
+            e.setGhosts(ghosts);
         }
     }
 
@@ -126,7 +128,8 @@ public class Window extends JFrame implements KeyListener {
         // iterate through map and set spawns
         for (int i = 0; i < map.height; i++) {
             for (int j = 0; j < map.width; j++) {
-                if (map.at(i, j) == 'B') {
+                char val = map.at(i, j);
+                if (val == 'B' || val == 'I' || val == 'P' || val == 'C') {
                     spawns.add(new Vector2(i, j));
 //                    emptySpaces.add(new Vector2(i, j));
                 }
@@ -134,17 +137,18 @@ public class Window extends JFrame implements KeyListener {
         }
 
         BufferedImage[] blueGhosts = Utils.getImages("./img/ghosts/blue_ghost");
+        BufferedImage[] eatenGhosts = Utils.getImages("./img/ghosts/eyes");
 
         // get the pixel spot of spawn location
         Vector2 pixelSpot = map.getPoint((int) spawns.get(0).x, (int) spawns.get(0).y);
         // create a ghost at that position
-        Ghost g = new Ghost("pinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        Ghost g = new Ghost("pinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         g.name = 'p';
         g.mapChar = 'p';
 
-
-        Ghost b = new Ghost("blinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).x, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        pixelSpot = map.getPoint((int) spawns.get(1).x, (int) spawns.get(1).y);
+        Ghost b = new Ghost("blinky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         b.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
         b.name = 'b';
         b.mapChar = 'b';
@@ -156,12 +160,15 @@ public class Window extends JFrame implements KeyListener {
 
         for (Ghost gh : ghosts) {
             gh.setBlueGhost(blueGhosts);
+            gh.setEatenGhost(eatenGhosts);
             gh.player = this.player;
             gh.walls = walls;
             gh.updateMap(this.map);
             gh.setupScatterPath();
             addEntity(gh);
         }
+
+        player.setGhosts(ghosts);
     }
 
     /**
@@ -186,7 +193,7 @@ public class Window extends JFrame implements KeyListener {
         for (Entity f : food) {
             Food food = (Food) f;
             food.player = player;
-            food.counter = statsCounter;
+            food.setStatsCounter(statsCounter);
             if (Math.random() < this.fruitChance) {
                 food.setFruit();
             }

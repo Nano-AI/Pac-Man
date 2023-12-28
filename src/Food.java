@@ -11,7 +11,6 @@ import java.awt.*;
 public class Food extends Entity {
 
     public Player player; // Reference to the player entity
-    public StatsCounter counter; // Reference to the stats counter entity
     private boolean eaten = false; // Flag to track whether the food has been eaten
     private boolean fruit = false;
 
@@ -61,10 +60,13 @@ public class Food extends Entity {
     @Override
     public void update(double deltaT) {
         if (isTouching(player) && !eaten) {
-            counter.addEaten();
+            getStatsCounter().addEaten();
             if (isFruit()) {
                 getAudioPlayer().playSound("gs_eatfruit");
                 player.setAngry();
+                for (Ghost g : getGhosts()) {
+                    g.setMode(Ghost.Mode.SCARED);
+                }
             } else {
                 getAudioPlayer().playSound("gs_chomp");
             }

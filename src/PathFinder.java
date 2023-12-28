@@ -117,7 +117,7 @@ public class PathFinder {
     }
 
     private double heuristic(Vector2 a, Vector2 b) {
-        return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 
     private boolean isValid(Vector2 v) {

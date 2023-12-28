@@ -26,7 +26,7 @@ public class Player extends Entity {
     private BufferedImage[] downFrames;
 
     public boolean dead = false;
-    private boolean angry = true;
+    private boolean angry = false;
     private double angryTimer = 0f;
     public final double TOTAL_ANGRY_TIME = 300f;
     /**
@@ -164,7 +164,10 @@ public class Player extends Entity {
             if (TOTAL_ANGRY_TIME <= angryTimer) {
                 angry = false;
                 angryTimer = 0;
-                System.out.println("not angry!");
+
+                for (Ghost g : getGhosts()) {
+                    g.setMode(Ghost.Mode.BASE);
+                }
             }
         }
         deltaAnimate += deltaT;

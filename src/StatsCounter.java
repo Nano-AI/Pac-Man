@@ -82,6 +82,10 @@ public class StatsCounter extends Entity {
         score += 10;
     }
 
+    public void addGhost() {
+        score += 100;
+    }
+
     /**
      * Override of the update method to track the time since the last update.
      *

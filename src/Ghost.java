@@ -48,9 +48,25 @@ public class Ghost extends Entity {
 
     private BufferedImage[] blueGhost;
     private BufferedImage[] normalGhost;
+    private BufferedImage[] eatenGhost;
     private boolean scared = false;
     private double flickerTimer = 0f;
     private double MAX_SCATTER_TIME = 750 + Math.random() * 200;
+
+    private boolean resetting = false;
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    public enum Mode {
+        BASE,
+        EATEN,
+        SCARED
+    }
+
+    private Mode mode = Mode.BASE;
+    private Vector2 spawn;
 
     /**
      * Default constructor for the ghost
@@ -75,18 +91,21 @@ public class Ghost extends Entity {
         supposedPath = new LinkedList<>();
         // more vars
         blocked = true;
-        baseSpeed = 1.75;
+        baseSpeed = 1.7;
         speed = baseSpeed;
 //        chaseSpeed = 1.1 * speed;
-        chaseSpeed = 1.99;
+        chaseSpeed = 1.8;
+        System.out.println(gridX + " " + gridY);
+        spawn = new Vector2(gridX, gridY);
+
+        setImages(normalGhost);
     }
 
     public void setBlueGhost(BufferedImage[] images) {
         this.blueGhost = images;
     }
-
-    public void setNormalGhost(BufferedImage[] images) {
-        this.normalGhost = images;
+    public void setEatenGhost(BufferedImage[] images) {
+        this.eatenGhost = images;
     }
 
     /**
@@ -135,7 +154,13 @@ public class Ghost extends Entity {
         if (player.isAngry()) {
             flickerTimer += deltaT;
         }
-        if (Utils.withinRange(player.getAngryTimer(), player.TOTAL_ANGRY_TIME, 0.7)) {
+
+        if (player.getAngryTimer() >= player.TOTAL_ANGRY_TIME) {
+            mode = Mode.BASE;
+            scared = false;
+        }
+
+        if (Utils.withinRange(player.getAngryTimer(), player.TOTAL_ANGRY_TIME, 0.7) && !resetting && mode == Mode.SCARED) {
             if (flickerTimer >= 10) {
                 setImages(
                         scared ? blueGhost : normalGhost
@@ -144,10 +169,30 @@ public class Ghost extends Entity {
                 flickerTimer = 0;
             }
         } else {
-            if (player.isAngry()) {
+            if (resetting) {
+                setImages(eatenGhost);
+                mode = Mode.EATEN;
+                scared = false;
+            } else if (mode == Mode.SCARED) {
                 setImages(blueGhost);
+                scared = true;
             } else {
                 setImages(normalGhost);
+                mode = Mode.BASE;
+                scared = false;
+            }
+        }
+
+        if (getGridPos() != null && isTouching(player) && getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
+            if (player.isAngry() && scared) {
+                if (!resetting) {
+                    scared = false;
+                    resetting = true;
+                    supposedPath.clear();
+                    mode = Mode.EATEN;
+                }
+            } else {
+                player.dead = true;
             }
         }
 
@@ -155,16 +200,48 @@ public class Ghost extends Entity {
         updateGridSpot();
         move(deltaT);
         pathUpdate += deltaT;
+    }
 
-        if (isTouching(player) && getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
-//            player.dead = true;
+    private void moveReset(double deltaT) {
+        if (getGridPos().gridPos.equals(spawn)) {
+            resetting = false;
+            return;
         }
+        if (supposedPath == null || supposedPath.isEmpty()) {
+            supposedPath = finder.findPath(getGridPos().gridPos, spawn);
+            System.out.println(getGridPos().gridPos + " " + spawn);
+            System.out.println(supposedPath);
+        }
+
+        Vector2 v = supposedPath.peek();
+        if (v == null) return;
+        if (getGridPos().gridPos.equals(v)) {
+            // make sure to loop throuhg it and make sure that it goes back to the head
+            // after it reaches the end
+            v = supposedPath.remove();
+        }
+
+        // go towards the grid pos by finding the distance between the current and next,
+        // normalizing it, then setting the direction
+        if (v == null) return;
+        Vector2 goTo = getGridPos().gridPos.distanceTo(v).normalize();
+        setWantedDirection(goTo.swap().multiply(-1));
+        moveInDirection(deltaT);
     }
 
     // TODO: fix the scatter movement; it doesn't work
     public void move(double deltaT) {
+        if (resetting) {
+            moveReset(deltaT);
+            return;
+        }
         if (!canSee(player) && totalScatterTime < MAX_SCATTER_TIME) {
             moveScatter(deltaT);
+            return;
+        }
+
+        if (mode == Mode.SCARED) {
+            moveScared(deltaT);
             return;
         }
 
@@ -175,6 +252,33 @@ public class Ghost extends Entity {
             default:
                 moveRandom(deltaT);
         }
+    }
+
+    // TODO: write better code for when the ghost is scared
+    private void moveScared(double deltaT) {
+        ArrayList<Vector2> pos = map.getNeighbors(getGridPos().gridPos);
+        Vector2 currentDir = getDirection();
+        Vector2 dir = pos.get(0).swap();
+        Vector2 toPlayer = player.getGridPos().gridPos.distanceTo(getGridPos().gridPos)
+                .normalize()
+                .swap();
+        int i;
+        for (i = 0; i < pos.size(); i++) {
+            Vector2 sp = pos.get(i).swap();
+            if (sp.multiply(-1).equals(currentDir)) {
+                pos.remove(i);
+                i--;
+            }
+            else if (sp.x == toPlayer.x || sp.y == toPlayer.y) {
+                pos.remove(i);
+                i--;
+            }
+        }
+        if (!pos.isEmpty()) dir = pos.get((int) (Math.random() * pos.size())).swap();
+//        else dir = Utils.getDirections()[((int) (Math.random() * Utils.getDirections().length))];
+
+        setWantedDirection(dir);
+        moveInDirection(deltaT);
     }
 
     /**

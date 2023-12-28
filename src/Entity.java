@@ -45,6 +45,25 @@ public class Entity {
     public double speed;
     private AudioPlayer audioPlayer;
 
+    private StatsCounter statsCounter;
+    private ArrayList<Ghost> ghosts;
+
+    public void setGhosts(ArrayList<Ghost> ghosts) {
+        this.ghosts = ghosts;
+    }
+
+    public ArrayList<Ghost> getGhosts() {
+        return this.ghosts;
+    }
+
+    public void setStatsCounter(StatsCounter counter) {
+        this.statsCounter = counter;
+    }
+
+    public StatsCounter getStatsCounter() {
+        return this.statsCounter;
+    }
+
     public void setAudioPlayer(AudioPlayer player) {
         this.audioPlayer = player;
     }
