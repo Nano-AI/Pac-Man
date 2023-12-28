@@ -61,7 +61,7 @@ public class PathFinder {
             Node currentNode = openSet.poll();
             iterations++;
             if (iterations > Math.pow(map.length, 3)) {
-                return reconstructPath(currentNode);
+                return new LinkedList<>();
             }
 
             if (currentNode.pos.equals(endNode.pos)) {

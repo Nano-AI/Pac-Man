@@ -6,6 +6,7 @@
  */
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -45,6 +46,11 @@ public class Ghost extends Entity {
     private PathFinder finder;
     private double randomT = 0;
 
+    private BufferedImage[] blueGhost;
+    private BufferedImage[] normalGhost;
+    private boolean scared = false;
+    private double flickerTimer = 0f;
+
     /**
      * Default constructor for the ghost
      * @param name Name of the ghost.
@@ -59,7 +65,7 @@ public class Ghost extends Entity {
         // super method
         super(x, y, gridX, gridY, width, height);
         // setup the images
-        setupImages("./img/ghosts/" + name);
+        normalGhost = Utils.getImages("./img/ghosts/" + name);
         // set the map char thing
         mapChar = 'p';
         // set detec ction radius
@@ -72,6 +78,14 @@ public class Ghost extends Entity {
         speed = baseSpeed;
 //        chaseSpeed = 1.1 * speed;
         chaseSpeed = 1.99;
+    }
+
+    public void setBlueGhost(BufferedImage[] images) {
+        this.blueGhost = images;
+    }
+
+    public void setNormalGhost(BufferedImage[] images) {
+        this.normalGhost = images;
     }
 
     /**
@@ -117,18 +131,47 @@ public class Ghost extends Entity {
 
     @Override
     public void update(double deltaT) {
-//        if (getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
+//        if () {
 //            player.dead = true;
 //        }
+        if (player.isAngry()) {
+            setImages(blueGhost);
+            flickerTimer += deltaT;
+        } else {
+            setImages(normalGhost);
+        }
+
+        if (Utils.withinRange(player.getAngryTimer(), player.TOTAL_ANGRY_TIME, 0.4)) {
+            double left = player.TOTAL_ANGRY_TIME - player.getAngryTimer();
+
+            left = Math.sin(left / 100);
+
+            if (Utils.withinRange(left, 0, 1)) {
+                System.out.println("flick");
+                setImages(
+                        scared ? blueGhost : normalGhost
+                );
+                scared = !scared;
+//                flickerTimer = 0;
+            }
+
+            if (flickerTimer >= left) {
+            }
+        }
 
         randomT += deltaT;
         updateGridSpot();
         move(deltaT);
         pathUpdate += deltaT;
+
+        if (isTouching(player) && getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
+//            player.dead = true;
+        }
     }
 
+    // TODO: fix the scatter movement; it doesn't work
     public void move(double deltaT) {
-        if (!canSee(player) && totalScatterTime < 7) {
+        if (!canSee(player) && totalScatterTime < 100) {
             moveScatter(deltaT);
             return;
         }
@@ -218,7 +261,13 @@ public class Ghost extends Entity {
         if (supposedPath.size() <= 1) {
             supposedPath = finder.findPath(this.getGridPos().gridPos, player.getGridPos().gridPos);
             if (supposedPath == null) return;
-            supposedPath.poll();
+            if (supposedPath.size() <= 1) {
+                moveRandom(deltaT);
+                return;
+            }
+            if (getGridPos().gridPos.equals(supposedPath.peek())) {
+                supposedPath.poll();
+            }
             if (supposedPath.isEmpty()) {
                 System.out.println("CAUGHT");
                 return;
@@ -230,6 +279,10 @@ public class Ghost extends Entity {
         // go towards the grid pos by finding the distance between the current and next,
         // normalizing it, then setting the direction
         Vector2 goTo = getGridPos().gridPos.distanceTo(supposedPath.peek()).normalize();
+        if (Math.abs(goTo.x) == Math.abs(goTo.y)) {
+            supposedPath.clear();
+            return;
+        }
         // pixel coordinates: (x, y) and go left to right, then top to bottom increments
         // grid coordinates: (y, x) and go up to down, then left to right
         // so in order to go in the correct direction we have to swap and mulitply by -1

@@ -81,7 +81,8 @@ public class Entity {
      * Increment the frame index for animation and return the previous image.
      *
      * @return The BufferedImage of the previous frame.
-     */    public BufferedImage incrementFrameIndex() {
+     */
+    public BufferedImage incrementFrameIndex() {
         BufferedImage prev = getImage(frameIndex);
         frameIndex++;
         if (frameIndex >= images.length) {

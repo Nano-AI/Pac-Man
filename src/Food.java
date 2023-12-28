@@ -13,6 +13,15 @@ public class Food extends Entity {
     public Player player; // Reference to the player entity
     public StatsCounter counter; // Reference to the stats counter entity
     private boolean eaten = false; // Flag to track whether the food has been eaten
+    private boolean fruit = false;
+
+    public void setFruit() {
+        this.fruit = true;
+    }
+
+    public boolean isFruit() {
+        return this.fruit;
+    }
 
     /**
      * Constructor for Food class with specified parameters.
@@ -36,7 +45,11 @@ public class Food extends Entity {
     public void draw(Graphics g) {
         if (!eaten) {
             g.setColor(Color.YELLOW);
-            g.fillRect(getX(), getY(), getWidth(), getHeight());
+            if (isFruit()) {
+                g.fillOval(getX() - getWidth() / 2, getY() - getHeight() / 2, getWidth() * 2, getHeight() * 2);
+            } else {
+                g.fillRect(getX(), getY(), getWidth(), getHeight());
+            }
         }
     }
 
@@ -49,7 +62,12 @@ public class Food extends Entity {
     public void update(double deltaT) {
         if (isTouching(player) && !eaten) {
             counter.addEaten();
-            getAudioPlayer().playSound("gs_chomp");
+            if (isFruit()) {
+                getAudioPlayer().playSound("gs_eatfruit");
+                player.setAngry();
+            } else {
+                getAudioPlayer().playSound("gs_chomp");
+            }
             eaten = true;
         }
     }

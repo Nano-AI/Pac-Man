@@ -26,6 +26,9 @@ public class Player extends Entity {
     private BufferedImage[] downFrames;
 
     public boolean dead = false;
+    private boolean angry = true;
+    private double angryTimer = 0f;
+    public final double TOTAL_ANGRY_TIME = 300f;
     /**
      * Constructor for the Player class with specified parameters.
      *
@@ -47,6 +50,19 @@ public class Player extends Entity {
         downFrames = Utils.getImages("./img/pacman-down");
 
         setDirection('e');
+    }
+
+    public boolean isAngry() {
+        return this.angry;
+    }
+
+    public double getAngryTimer() {
+        return this.angryTimer;
+    }
+
+    public void setAngry() {
+        this.angryTimer = 0;
+        this.angry = true;
     }
 
     /**
@@ -142,6 +158,15 @@ public class Player extends Entity {
 //            addPath();
 //        }
         // set the deltaT
+//        System.out.println(angryTimer);
+        if (angry) {
+            angryTimer += deltaT;
+            if (TOTAL_ANGRY_TIME <= angryTimer) {
+                angry = false;
+                angryTimer = 0;
+                System.out.println("not angry!");
+            }
+        }
         deltaAnimate += deltaT;
 
         moveInDirection(deltaT);

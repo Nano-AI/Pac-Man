@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class Window extends JFrame implements KeyListener {
@@ -28,6 +29,7 @@ public class Window extends JFrame implements KeyListener {
     private Image bufferImage;
     private Graphics2D buffer;
     public AudioPlayer audioPlayer;
+    private double fruitChance = 0.01;
 
     /**
      * Constructor of the Window class.
@@ -131,6 +133,8 @@ public class Window extends JFrame implements KeyListener {
             }
         }
 
+        BufferedImage[] blueGhosts = Utils.getImages("./img/ghosts/blue_ghost");
+
         // get the pixel spot of spawn location
         Vector2 pixelSpot = map.getPoint((int) spawns.get(0).x, (int) spawns.get(0).y);
         // create a ghost at that position
@@ -151,8 +155,8 @@ public class Window extends JFrame implements KeyListener {
 
 
         for (Ghost gh : ghosts) {
+            gh.setBlueGhost(blueGhosts);
             gh.player = this.player;
-//            gh.map = this.map;
             gh.walls = walls;
             gh.updateMap(this.map);
             gh.setupScatterPath();
@@ -180,8 +184,12 @@ public class Window extends JFrame implements KeyListener {
     private void setupFood() {
         // iterate through all food and set the player and counter of each one as reference
         for (Entity f : food) {
-            ((Food) f).player = player;
-            ((Food) f).counter = statsCounter;
+            Food food = (Food) f;
+            food.player = player;
+            food.counter = statsCounter;
+            if (Math.random() < this.fruitChance) {
+                food.setFruit();
+            }
             entities.add(f);
         }
     }
@@ -262,11 +270,19 @@ public class Window extends JFrame implements KeyListener {
         g.drawImage(bufferImage, 0, 0, null);
     }
 
+    private void gameOver() {
+        audioPlayer.playSound("gs_pacmandies");
+        running = false;
+    }
+
     /**
      * Update function that updates all game logic.
      * @param delta Delta time between previous and current render
      */
     public void update(double delta) {
+        if (player.dead) {
+            gameOver();
+        }
         // set delta t
         this.deltaT = delta;
 
