@@ -174,9 +174,14 @@ public class Player extends Entity {
         // animate every 5 (forgot units ms), and make sure it's not blocekd and moving
         if (deltaAnimate >= 5 && !blocked) {
             incrementFrameIndex();
-            getAudioPlayer().playSound("gs_siren_soft");
             deltaAnimate = 0;
         }
+
+        String soundName = "gs_siren_soft";
+        if (this.angry) {
+            soundName = "gs_ghostblue";
+        }
+        getAudioPlayer().playSound(soundName);
 
         // update the grid spot at which the player is currently at
         updateGridSpot();

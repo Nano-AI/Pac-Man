@@ -72,7 +72,7 @@ public class Utils {
      * @return True if the value is within the range, false otherwise.
      */
     public static boolean withinRange(double value, double equal, double percent) {
-        System.out.println(Math.abs((value - equal) / value));
+//        System.out.println(Math.abs((value - equal) / value));
         return Math.abs((value - equal) / (value)) <= percent;
 //        return value * (1 - percent) <= equal && value * (1 + percent) >= equal;
     }

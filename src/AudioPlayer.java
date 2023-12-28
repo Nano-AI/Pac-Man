@@ -26,6 +26,7 @@ public class AudioPlayer {
 
     public void playSound(String fileName) {
         Clip sound = getSound(fileName);
+        if (sound.isRunning()) return;
         if (isSoundDone(fileName) || sound.getMicrosecondPosition() == 0) {
             sound.setMicrosecondPosition(0);
             sound.start();
@@ -35,6 +36,10 @@ public class AudioPlayer {
     public boolean isSoundDone(String soundName) {
         Clip sound = getSound(soundName);
         return sound.getMicrosecondLength() == sound.getMicrosecondPosition();
+    }
+
+    public boolean isSoundStart(String sound) {
+        return getSound(sound).getMicrosecondPosition() == 0;
     }
 
     private Clip getSound(String name) {

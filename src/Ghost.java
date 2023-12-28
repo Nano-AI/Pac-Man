@@ -50,6 +50,7 @@ public class Ghost extends Entity {
     private BufferedImage[] normalGhost;
     private boolean scared = false;
     private double flickerTimer = 0f;
+    private double MAX_SCATTER_TIME = 750 + Math.random() * 200;
 
     /**
      * Default constructor for the ghost
@@ -131,31 +132,22 @@ public class Ghost extends Entity {
 
     @Override
     public void update(double deltaT) {
-//        if () {
-//            player.dead = true;
-//        }
         if (player.isAngry()) {
-            setImages(blueGhost);
             flickerTimer += deltaT;
-        } else {
-            setImages(normalGhost);
         }
-
-        if (Utils.withinRange(player.getAngryTimer(), player.TOTAL_ANGRY_TIME, 0.4)) {
-            double left = player.TOTAL_ANGRY_TIME - player.getAngryTimer();
-
-            left = Math.sin(left / 100);
-
-            if (Utils.withinRange(left, 0, 1)) {
-                System.out.println("flick");
+        if (Utils.withinRange(player.getAngryTimer(), player.TOTAL_ANGRY_TIME, 0.7)) {
+            if (flickerTimer >= 10) {
                 setImages(
                         scared ? blueGhost : normalGhost
                 );
                 scared = !scared;
-//                flickerTimer = 0;
+                flickerTimer = 0;
             }
-
-            if (flickerTimer >= left) {
+        } else {
+            if (player.isAngry()) {
+                setImages(blueGhost);
+            } else {
+                setImages(normalGhost);
             }
         }
 
@@ -171,10 +163,11 @@ public class Ghost extends Entity {
 
     // TODO: fix the scatter movement; it doesn't work
     public void move(double deltaT) {
-        if (!canSee(player) && totalScatterTime < 100) {
+        if (!canSee(player) && totalScatterTime < MAX_SCATTER_TIME) {
             moveScatter(deltaT);
             return;
         }
+
         switch (name) {
             case 'b':
                 moveChase(deltaT);
@@ -218,6 +211,7 @@ public class Ghost extends Entity {
                 moveInDirection(deltaT);
             }
         } else {
+            totalScatterTime += deltaT;
             // move through the scatter path
             Vector2 nextPos = supposedPath.peek();
             // same thing, check if we're same grid pos
