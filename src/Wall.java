@@ -6,6 +6,7 @@
  * @version 26 November, 2023
  */
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Wall extends Entity {
     private Map m;
@@ -18,10 +19,15 @@ public class Wall extends Entity {
      * @param width  The width of the wall.
      * @param height The height of the wall.
      */
+    private BufferedImage wallImage;
     public Wall(int x, int y, int width, int height) {
         super(x, y, width, height);
         mapChar = 'W';
         this.hitbox = new Rect(0, 0, width, height);
+    }
+
+    public void setWallImage(BufferedImage img) {
+        this.wallImage = img;
     }
 
     /**
@@ -30,7 +36,13 @@ public class Wall extends Entity {
      * @param g The Graphics object on which to draw the wall.
      */
     public void draw(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
         g.setColor(Color.BLUE);
-        g.fillRect(getX(), getY(), getWidth(), getHeight());
+        if (wallImage != null)
+            g2.drawImage(wallImage, getX(), getY(), getWidth(), getHeight(), null);
+        else {
+            g.setColor(Color.PINK);
+            g.fillRect(getX(), getY(), getWidth(), getHeight());
+        }
     }
 }

@@ -184,15 +184,17 @@ public class Ghost extends Entity {
         }
 
         if (getGridPos() != null && isTouching(player) && getGridPos().gridPos.equals(player.getGridPos().gridPos)) {
-            if (player.isAngry() && scared) {
+            if (player.isAngry() && mode == Mode.SCARED) {
                 if (!resetting) {
                     scared = false;
                     resetting = true;
                     supposedPath.clear();
                     mode = Mode.EATEN;
                 }
-            } else {
+            } else if (mode == Mode.BASE) {
                 player.dead = true;
+            } else if (mode == Mode.SCARED) {
+                getAudioPlayer().playSound("gs_returnghost");
             }
         }
 
@@ -205,12 +207,11 @@ public class Ghost extends Entity {
     private void moveReset(double deltaT) {
         if (getGridPos().gridPos.equals(spawn)) {
             resetting = false;
+            supposedPath.clear();
             return;
         }
         if (supposedPath == null || supposedPath.isEmpty()) {
             supposedPath = finder.findPath(getGridPos().gridPos, spawn);
-            System.out.println(getGridPos().gridPos + " " + spawn);
-            System.out.println(supposedPath);
         }
 
         Vector2 v = supposedPath.peek();
@@ -256,7 +257,7 @@ public class Ghost extends Entity {
 
     // TODO: write better code for when the ghost is scared
     private void moveScared(double deltaT) {
-        ArrayList<Vector2> pos = map.getNeighbors(getGridPos().gridPos);
+        ArrayList<Vector2> pos = map.getOpenNeighbors(getGridPos().gridPos);
         Vector2 currentDir = getDirection();
         Vector2 dir = pos.get(0).swap();
         Vector2 toPlayer = player.getGridPos().gridPos.distanceTo(getGridPos().gridPos)
@@ -367,7 +368,6 @@ public class Ghost extends Entity {
                 supposedPath.poll();
             }
             if (supposedPath.isEmpty()) {
-                System.out.println("CAUGHT");
                 return;
             }
         }
@@ -431,7 +431,7 @@ public class Ghost extends Entity {
 
     private void moveRandom(double deltaT) {
         // TODO: dude idk fix it later
-        ArrayList<Vector2> pos = map.getNeighbors(getGridPos().gridPos);
+        ArrayList<Vector2> pos = map.getOpenNeighbors(getGridPos().gridPos);
         Vector2 currentDir = getDirection();
         Vector2 dir = pos.get(0).swap();
         for (int i = 0; i < pos.size(); i++) {
@@ -458,33 +458,6 @@ public class Ghost extends Entity {
         Vector2 p = getPos();
         Vector2 size = getSize();
 
-        // coloring the scatter path
-//        Node<Vector2> head = sortedScatterPath.head;
-//        while (head.next != null) {
-//            Vector2 v1 = map.getPoint(head.val);
-//            Vector2 v2 = map.getPoint(head.next.val);
-//            g2.drawLine(
-//                    (int) v1.x, (int) v1.y, (int) v2.x, (int) v2.y
-//            );
-//            head = head.next;
-//        }
-
-        // outlining the path the ghost should go on
-//        for (Vector2 v : supposedPath) {
-//            Vector2 pFind = map.getPoint(v);
-//            g2.fillRect((int) pFind.x, (int) pFind.y, map.pixelPerHorizontalGrid, map.pixelPerHorizontalGrid);
-//        }
-
-//        for (Vector2 v : map.getNeighbors(getGridPos().gridPos)) {
-//            v = v.swap();
-//            g2.fillRect((int) (getX() + v.x * map.pixelPerVerticalGrid), (int) (getY() + v.y * map.pixelPerVerticalGrid), map.pixelPerHorizontalGrid, map.pixelPerHorizontalGrid);
-//        }
         g2.drawImage(getImage(), (int) p.x, (int) p.y, (int) size.x, (int) size.y, null);
-
-//        if (findPath != null)
-//            for (Vector2 v : findPath) {
-//                g2.setColor(Color.RED);
-//                g2.fillRect((int) v.x, (int) v.y, m.pixelPerHorizontalGrid, m.pixelPerVerticalGrid);
-//            }
     }
 }

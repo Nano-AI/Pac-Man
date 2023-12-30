@@ -1,4 +1,3 @@
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -182,11 +181,36 @@ public class Map {
         return at(v) != 'W' && valid(v);
     }
 
+    public ArrayList<Vector2> getOpenNeighbors(Vector2 pos) {
+        return getNeighbors(pos, true);
+    }
+
     public ArrayList<Vector2> getNeighbors(Vector2 pos) {
+        return getNeighbors(pos, false);
+    }
+
+    public boolean inBounds(int x, int y) {
+        return x >= 0 && x < baseGrid.length && y >= 0 && y < baseGrid[0].length;
+    }
+
+    public String getNeighborsAsGrid(Vector2 pos) {
+        StringBuilder around = new StringBuilder();
+        for (Vector2 d : Utils.getDirections()) {
+            Vector2 cpy = d.add(pos);
+            int x = (int) cpy.x;
+            int y = (int) cpy.y;
+            if (!inBounds(x, y)) around.append(" ");
+            else around.append(baseGrid[x][y]);
+        }
+        return around.toString();
+    }
+
+    public ArrayList<Vector2> getNeighbors(Vector2 pos, boolean open) {
+
         ArrayList<Vector2> o = new ArrayList<>();
         for (Vector2 c : Utils.getDirections()) {
             Vector2 cpy = pos.copy().add(c);
-            if (baseGrid[(int) cpy.x][(int) cpy.y] == ' ') {
+            if (open && baseGrid[(int) cpy.x][(int) cpy.y] == ' ') {
                 o.add(c);
             }
         }

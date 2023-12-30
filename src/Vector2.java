@@ -6,6 +6,7 @@
  * @version 26 November, 2023
  */
 import java.awt.*;
+import java.util.Objects;
 
 public class Vector2 {
     public double x, y;
@@ -19,6 +20,14 @@ public class Vector2 {
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Vector2 previous = null;
+
+    public Vector2 offset(int ox, int oy) {
+        Vector2 o = new Vector2(x + ox, y + oy);
+        o.previous = this;
+        return o;
     }
 
     /**
@@ -108,11 +117,18 @@ public class Vector2 {
     /**
      * Check if the current vector is equal to another vector.
      *
-     * @param v The vector to compare with.
+     * @param o The vector to compare with.
      * @return True if the vectors are equal, false otherwise.
      */
-    public boolean equals(Vector2 v) {
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Vector2 v)) return false;
         return x == v.x && y == v.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 
     public boolean equals(double x, double y) {

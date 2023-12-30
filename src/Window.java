@@ -9,7 +9,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Window extends JFrame implements KeyListener {
     public boolean running = true;
@@ -29,7 +31,7 @@ public class Window extends JFrame implements KeyListener {
     private Image bufferImage;
     private Graphics2D buffer;
     public AudioPlayer audioPlayer;
-    private double fruitChance = 0.01;
+    private double fruitChance = 0.065;
 
     /**
      * Constructor of the Window class.
@@ -69,12 +71,6 @@ public class Window extends JFrame implements KeyListener {
 
         // add key listeners for key press events
         addKeyListener(this);
-    }
-
-    private void playStartScreen() {
-        this.audioPlayer.playSound("gs_start");
-        while (!audioPlayer.isSoundDone("gs_start")) {
-        }
     }
 
     /**
@@ -155,8 +151,6 @@ public class Window extends JFrame implements KeyListener {
 
         ghosts.add(g);
         ghosts.add(b);
-
-
 
         for (Ghost gh : ghosts) {
             gh.setBlueGhost(blueGhosts);
@@ -277,9 +271,18 @@ public class Window extends JFrame implements KeyListener {
         g.drawImage(bufferImage, 0, 0, null);
     }
 
-    private void gameOver() {
-        audioPlayer.playSound("gs_pacmandies");
+    private void gameOver(boolean won) {
+        if (won) {
+
+        } else {
+            audioPlayer.playSound("gs_pacmandies");
+        }
         running = false;
+
+        String prefix = won ? "won" : "lost";
+        JOptionPane.showMessageDialog(this,
+                "You " + prefix + " with " + statsCounter.getScore() + " points!"
+        );
     }
 
     /**
@@ -287,8 +290,12 @@ public class Window extends JFrame implements KeyListener {
      * @param delta Delta time between previous and current render
      */
     public void update(double delta) {
+        if (food.isEmpty()) {
+            gameOver(true);
+            return;
+        }
         if (player.dead) {
-            gameOver();
+            gameOver(false);
         }
         // set delta t
         this.deltaT = delta;
@@ -402,6 +409,7 @@ public class Window extends JFrame implements KeyListener {
         map.pixelPerHorizontalGrid = pixelPerHorizontalGrid;
         map.pixelPerVerticalGrid = pixelPerVerticalGrid;
 
+        ArrayList<Vector2> gridPos = new ArrayList<>();
         // iterate through everything in the grid
         for (int i = 0; i < map.width; i++) {
             for (int j = 0; j < map.height; j++) {
@@ -414,6 +422,7 @@ public class Window extends JFrame implements KeyListener {
                     Wall e = new Wall(xPos, yPos, pixelPerHorizontalGrid, pixelPerVerticalGrid);
                     e.setHitbox(new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid));
                     walls.add(e);
+                    gridPos.add(new Vector2(i, j));
                     // set the base grid
                     map.baseGrid[j][i] = 'W';
                 } else {
@@ -435,6 +444,44 @@ public class Window extends JFrame implements KeyListener {
                 map.setPoint(new Vector2(xPos, yPos), j, i);
             }
         }
+
+        BufferedImage[] wallImages = Utils.getImages("./img/walls");
+        int index = 0;
+        for (Entity entity : walls) {
+            Wall wall = (Wall) entity;
+            Vector2 pos = gridPos.get(index);
+            String n = map.getNeighborsAsGrid(pos.swap());
+
+            int ind = getInd(n);
+
+            if (ind >= 0) {
+                wall.setWallImage(wallImages[ind]);
+            }
+            index++;
+        }
+    }
+
+    private static int getInd(String n) {
+        int ind = -1;
+        switch (n) {
+            case " W W" -> ind = 0;
+            case " WW " -> ind = 1;
+            case "  WW" -> ind = 2;
+            case "WW  " -> ind = 3;
+            case "W  W" -> ind = 4;
+            case "W W " -> ind = 5;
+            case " WWW" -> ind = 6;
+            case "W   " -> ind = 7;
+            case " W  " -> ind = 8;
+            case "  W " -> ind = 9;
+            case "   W" -> ind = 10;
+            case "    " -> ind = 11;
+            case "WWW " -> ind = 12;
+            case "W WW" -> ind = 13;
+            case "WW W" -> ind = 14;
+            case "WWWW" -> ind = 15;
+        }
+        return ind;
     }
 
     /**

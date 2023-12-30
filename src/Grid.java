@@ -11,6 +11,7 @@ public class Grid extends Entity {
     public Vector2 gridPos;
     public Grid(int x, int y, int gridX, int gridY, int width, int height) {
         super(x, y, gridX, gridY, width, height);
+        this.gridPos = new Vector2(gridX, gridY);
     }
 
     @Override

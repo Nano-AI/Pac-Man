@@ -45,6 +45,10 @@ public class StatsCounter extends Entity {
         }
     }
 
+    public int getScore() {
+        return this.score;
+    }
+
     /**
      * Override of the draw method to render statistics on the screen.
      *
