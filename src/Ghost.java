@@ -51,7 +51,7 @@ public class Ghost extends Entity {
     private BufferedImage[] eatenGhost;
     private boolean scared = false;
     private double flickerTimer = 0f;
-    private double MAX_SCATTER_TIME = 750 + Math.random() * 200;
+    private double MAX_SCATTER_TIME;
 
     private boolean resetting = false;
 
@@ -81,6 +81,7 @@ public class Ghost extends Entity {
     public Ghost(String name, int x, int y, int gridX, int gridY, int width, int height) {
         // super method
         super(x, y, gridX, gridY, width, height);
+        MAX_SCATTER_TIME = 750 + Math.random() * 200;
         // setup the images
         normalGhost = Utils.getImages("./img/ghosts/" + name);
         // set the map char thing
@@ -91,10 +92,10 @@ public class Ghost extends Entity {
         supposedPath = new LinkedList<>();
         // more vars
         blocked = true;
-        baseSpeed = 1.7;
+        baseSpeed = 1.5;
         speed = baseSpeed;
 //        chaseSpeed = 1.1 * speed;
-        chaseSpeed = 1.8;
+        chaseSpeed = 1.7;
         System.out.println(gridX + " " + gridY);
         spawn = new Vector2(gridX, gridY);
 
@@ -190,6 +191,7 @@ public class Ghost extends Entity {
                     resetting = true;
                     supposedPath.clear();
                     mode = Mode.EATEN;
+                    getAudioPlayer().playSound("gs_eatghost");
                 }
             } else if (mode == Mode.BASE) {
                 player.dead = true;
@@ -212,6 +214,11 @@ public class Ghost extends Entity {
         }
         if (supposedPath == null || supposedPath.isEmpty()) {
             supposedPath = finder.findPath(getGridPos().gridPos, spawn);
+        }
+
+        if (supposedPath.isEmpty()) {
+            moveRandom(deltaT);
+            return;
         }
 
         Vector2 v = supposedPath.peek();
@@ -247,11 +254,10 @@ public class Ghost extends Entity {
         }
 
         switch (name) {
-            case 'b':
-                moveChase(deltaT);
-                break;
-            default:
-                moveRandom(deltaT);
+            case 'b' -> moveChase(deltaT);
+            case 'i' -> moveInfront(deltaT);
+            case 'c' -> moveProximity(deltaT);
+            default -> moveRandom(deltaT);
         }
     }
 
@@ -339,6 +345,17 @@ public class Ghost extends Entity {
                 );
                 moveInDirection(deltaT);
             }
+        }
+    }
+
+    private void moveProximity(double deltaT) {
+        if (getDistanceTo(player) < 100f) {
+            moveChase(deltaT);
+        }
+        if (getDistanceTo(player) < 200f) {
+            moveInfront(deltaT);
+        } else {
+            moveRandom(deltaT);
         }
     }
 
@@ -443,6 +460,41 @@ public class Ghost extends Entity {
         if (!pos.isEmpty()) dir = pos.get((int) (Math.random() * pos.size())).swap();
 
         setWantedDirection(dir);
+        moveInDirection(deltaT);
+    }
+
+    private void moveInfront(double deltaT) {
+        if (supposedPath.size() <= 1) {
+//            Vector2 infront = getSig
+            supposedPath = finder.findPath(this.getGridPos().gridPos, player.getMovingTowards());
+            if (supposedPath == null) return;
+            if (supposedPath.size() <= 1) {
+                moveRandom(deltaT);
+                return;
+            }
+            if (getGridPos().gridPos.equals(supposedPath.peek())) {
+                supposedPath.poll();
+            }
+            if (supposedPath.isEmpty()) {
+                return;
+            }
+        }
+        if (getGridPos().gridPos.equals(supposedPath.peek())) {
+            supposedPath.poll();
+        }
+        // go towards the grid pos by finding the distance between the current and next,
+        // normalizing it, then setting the direction
+        Vector2 goTo = getGridPos().gridPos.distanceTo(supposedPath.peek()).normalize();
+        if (Math.abs(goTo.x) == Math.abs(goTo.y)) {
+            supposedPath.clear();
+            return;
+        }
+        // pixel coordinates: (x, y) and go left to right, then top to bottom increments
+        // grid coordinates: (y, x) and go up to down, then left to right
+        // so in order to go in the correct direction we have to swap and mulitply by -1
+        setWantedDirection(
+                goTo.swap().multiply(-1)
+        );
         moveInDirection(deltaT);
     }
 

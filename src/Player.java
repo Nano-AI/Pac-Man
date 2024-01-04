@@ -83,6 +83,14 @@ public class Player extends Entity {
         this.walls = walls;
     }
 
+    public Vector2 getMovingTowards() {
+        Vector2 g = getGridPos().gridPos.copy();
+        while (m.moveable(g)) {
+            g.add(getDirection().swap());
+        }
+        return g.add(getDirection().swap().multiply(-1));
+    }
+
     /**
      * Override of the draw method to render the player on the screen.
      *
@@ -99,6 +107,7 @@ public class Player extends Entity {
 //            );
 //        }
         drawImage(g);
+//        Vector2 m = this.m.getPoint(getMovingTowards());
     }
 
     /**

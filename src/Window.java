@@ -149,8 +149,22 @@ public class Window extends JFrame implements KeyListener {
         b.name = 'b';
         b.mapChar = 'b';
 
+        pixelSpot = map.getPoint((int) spawns.get(2).x, (int) spawns.get(2).y);
+        Ghost i = new Ghost("inky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        i.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        i.name = 'i';
+        i.mapChar = 'i';
+
+        pixelSpot = map.getPoint((int) spawns.get(3).x, (int) spawns.get(3).y);
+        Ghost c = new Ghost("clyde", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        c.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        c.name = 'c';
+        c.mapChar = 'c';
+
         ghosts.add(g);
         ghosts.add(b);
+        ghosts.add(i);
+        ghosts.add(c);
 
         for (Ghost gh : ghosts) {
             gh.setBlueGhost(blueGhosts);

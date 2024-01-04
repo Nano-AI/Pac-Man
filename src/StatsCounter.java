@@ -86,6 +86,10 @@ public class StatsCounter extends Entity {
         score += 10;
     }
 
+    public void addFruitEaten() {
+        score += 20;
+    }
+
     public void addGhost() {
         score += 100;
     }
