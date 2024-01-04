@@ -56,10 +56,10 @@ public class Ghost extends Entity {
     private boolean resetting = false;
 
     public void setMode(Mode mode) {
-        if (this.mode != mode) {
-            supposedPath.clear();
-            this.mode = mode;
-        }
+//        if (this.mode != mode) {
+//            supposedPath.clear();
+//        }
+        this.mode = mode;
 
         if (mode == Mode.EATEN) {
             setImages(eatenGhost);

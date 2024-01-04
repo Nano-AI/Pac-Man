@@ -16,7 +16,6 @@ import java.util.Queue;
 
 public class Player extends Entity {
     private double deltaAnimate = 0;
-    private boolean blocked = false;
 
     public ArrayList<Vector2> visited;
 
@@ -200,7 +199,7 @@ public class Player extends Entity {
         moveInDirection(deltaT);
 
         // animate every 5 (forgot units ms), and make sure it's not blocekd and moving
-        if (deltaAnimate >= 5 && !blocked) {
+        if (deltaAnimate >= 5 && !blocked && Utils.getDirection(getDirection()) != '0') {
             incrementFrameIndex();
             deltaAnimate = 0;
         }
