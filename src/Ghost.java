@@ -56,7 +56,21 @@ public class Ghost extends Entity {
     private boolean resetting = false;
 
     public void setMode(Mode mode) {
-        this.mode = mode;
+        if (this.mode != mode) {
+            supposedPath.clear();
+            this.mode = mode;
+        }
+
+        if (mode == Mode.EATEN) {
+            setImages(eatenGhost);
+            scared = false;
+        } else if (mode == Mode.SCARED) {
+            setImages(blueGhost);
+            scared = true;
+        } else {
+            setImages(normalGhost);
+            scared = false;
+        }
     }
 
     public enum Mode {
@@ -92,10 +106,10 @@ public class Ghost extends Entity {
         supposedPath = new LinkedList<>();
         // more vars
         blocked = true;
-        baseSpeed = 1.5;
+        baseSpeed = 1.33;
         speed = baseSpeed;
 //        chaseSpeed = 1.1 * speed;
-        chaseSpeed = 1.7;
+        chaseSpeed = 1.5;
         System.out.println(gridX + " " + gridY);
         spawn = new Vector2(gridX, gridY);
 
@@ -157,7 +171,8 @@ public class Ghost extends Entity {
         }
 
         if (player.getAngryTimer() >= player.TOTAL_ANGRY_TIME) {
-            mode = Mode.BASE;
+//            mode = Mode.BASE;
+            setMode(Mode.BASE);
             scared = false;
         }
 
@@ -171,16 +186,11 @@ public class Ghost extends Entity {
             }
         } else {
             if (resetting) {
-                setImages(eatenGhost);
-                mode = Mode.EATEN;
-                scared = false;
+                setMode(Mode.EATEN);
             } else if (mode == Mode.SCARED) {
-                setImages(blueGhost);
-                scared = true;
+                setMode(Mode.SCARED);
             } else {
-                setImages(normalGhost);
-                mode = Mode.BASE;
-                scared = false;
+                setMode(Mode.BASE);
             }
         }
 
@@ -254,38 +264,52 @@ public class Ghost extends Entity {
         }
 
         switch (name) {
-            case 'b' -> moveChase(deltaT);
-            case 'i' -> moveInfront(deltaT);
-            case 'c' -> moveProximity(deltaT);
-            default -> moveRandom(deltaT);
+            case 'b':
+                moveChase(deltaT);
+                break;
+            case 'i':
+                moveInfront(deltaT);
+                break;
+            case 'c':
+                moveProximity(deltaT);
+                break;
+            default:
+                break;
         }
+//        switch (name) {
+//            case 'b' -> moveChase(deltaT);
+//            case 'i' -> moveInfront(deltaT);
+//            case 'c' -> moveProximity(deltaT);
+//            default -> moveRandom(deltaT);
+//        }
     }
 
     // TODO: write better code for when the ghost is scared
     private void moveScared(double deltaT) {
-        ArrayList<Vector2> pos = map.getOpenNeighbors(getGridPos().gridPos);
-        Vector2 currentDir = getDirection();
-        Vector2 dir = pos.get(0).swap();
-        Vector2 toPlayer = player.getGridPos().gridPos.distanceTo(getGridPos().gridPos)
-                .normalize()
-                .swap();
-        int i;
-        for (i = 0; i < pos.size(); i++) {
-            Vector2 sp = pos.get(i).swap();
-            if (sp.multiply(-1).equals(currentDir)) {
-                pos.remove(i);
-                i--;
-            }
-            else if (sp.x == toPlayer.x || sp.y == toPlayer.y) {
-                pos.remove(i);
-                i--;
-            }
-        }
-        if (!pos.isEmpty()) dir = pos.get((int) (Math.random() * pos.size())).swap();
-//        else dir = Utils.getDirections()[((int) (Math.random() * Utils.getDirections().length))];
-
-        setWantedDirection(dir);
-        moveInDirection(deltaT);
+        moveRandom(deltaT);
+//        ArrayList<Vector2> pos = map.getOpenNeighbors(getGridPos().gridPos);
+//        Vector2 currentDir = getDirection();
+//        Vector2 dir = pos.get(0).swap();
+//        Vector2 toPlayer = player.getGridPos().gridPos.distanceTo(getGridPos().gridPos)
+//                .normalize()
+//                .swap();
+//        int i;
+//        for (i = 0; i < pos.size(); i++) {
+//            Vector2 sp = pos.get(i).swap();
+//            if (sp.multiply(-1).equals(currentDir)) {
+//                pos.remove(i);
+//                i--;
+//            }
+//            else if (sp.x == toPlayer.x || sp.y == toPlayer.y) {
+//                pos.remove(i);
+//                i--;
+//            }
+//        }
+//        if (!pos.isEmpty()) dir = pos.get((int) (Math.random() * pos.size())).swap();
+////        else dir = Utils.getDirections()[((int) (Math.random() * Utils.getDirections().length))];
+//
+//        setWantedDirection(dir);
+//        moveInDirection(deltaT);
     }
 
     /**
@@ -351,8 +375,7 @@ public class Ghost extends Entity {
     private void moveProximity(double deltaT) {
         if (getDistanceTo(player) < 100f) {
             moveChase(deltaT);
-        }
-        if (getDistanceTo(player) < 200f) {
+        } else if (getDistanceTo(player) < 200f) {
             moveInfront(deltaT);
         } else {
             moveRandom(deltaT);

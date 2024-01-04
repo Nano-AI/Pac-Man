@@ -28,7 +28,7 @@ public class Player extends Entity {
     public boolean dead = false;
     private boolean angry = false;
     private double angryTimer = 0f;
-    public final double TOTAL_ANGRY_TIME = 300f;
+    public final double TOTAL_ANGRY_TIME = 350f;
     /**
      * Constructor for the Player class with specified parameters.
      *
@@ -121,12 +121,28 @@ public class Player extends Entity {
         Vector2 p = getPos();
         Vector2 size = getSize();
 
-        BufferedImage[] frames = switch (Utils.getDirection(getDirection())) {
-            case 'n' -> upFrames;
-            case 's' -> downFrames;
-            case 'w' -> leftFrames;
-            default -> rightFrames;
-        };
+//        BufferedImage[] frames = switch (Utils.getDirection(getDirection())) {
+//            case 'n' -> upFrames;
+//            case 's' -> downFrames;
+//            case 'w' -> leftFrames;
+//            default -> rightFrames;
+//        };
+
+        BufferedImage[] frames;
+        switch (Utils.getDirection(getDirection())) {
+            case 'n':
+                frames = upFrames;
+                break;
+            case 's':
+                frames = downFrames;
+                break;
+            case 'w':
+                frames = leftFrames;
+                break;
+            default:
+                frames = rightFrames;
+                break;
+        }
 
         setImages(frames);
 
