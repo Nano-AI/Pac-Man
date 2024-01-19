@@ -30,7 +30,7 @@ for gy in range(0, width):
                 break
             for pixel in row:
                 cv2.rectangle(img, (y, x), (y + boxW, x + boxH), color=(0, 255, 0), thickness=1)
-                if np.all(pixel == 255):
+                if np.all(pixel == 255) or np.all(pixel == 0):
                     # cv2.rectangle(img, (y, x), (y + boxW, x + boxH), color=(0, 255, 255), thickness=2)
                     # print(x, y)
                     dot = True
