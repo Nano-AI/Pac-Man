@@ -1,5 +1,13 @@
 import java.util.*;
 
+/**
+ * The PathFinder class implements the A* pathfinding algorithm to locate a path from start to goal in a grid.
+ *
+ * This class utilizes a priority queue and various helper methods for pathfinding.
+ *
+ * @author Aditya Bankoti, Ekam Singh
+ * @version January 25, 2024
+ */
 public class PathFinder {
     private class Node {
         Vector2 pos;
@@ -7,6 +15,11 @@ public class PathFinder {
         int hCost;
         Node parent;
 
+        /**
+         * Constructs a Node with the specified position.
+         *
+         * @param pos The position of the node.
+         */
         public Node(Vector2 pos) {
             this.pos = pos;
             this.gCost = 0;
@@ -14,6 +27,7 @@ public class PathFinder {
             this.parent = null;
         }
     }
+
     final static char TRIED = 'T';
     final static char PATH = 'P';
     final static char OPEN = ' ';
@@ -26,6 +40,12 @@ public class PathFinder {
     private Vector2 end;
 
     Queue<Vector2> path;
+
+    /**
+     * Constructs a PathFinder with the specified grid.
+     *
+     * @param grid The grid representing the environment.
+     */
     public PathFinder(char[][] grid) {
         this.grid = grid;
         this.width = grid[0].length;
@@ -40,10 +60,11 @@ public class PathFinder {
     }
 
     /**
-     * Uses the A* path finding algo to locate where to go
-     * @param start The start location
-     * @param goal The eventual end goal to go towards
-     * @return A Queue telling directions in order
+     * Uses the A* pathfinding algorithm to locate a path from start to goal.
+     *
+     * @param start The start location.
+     * @param goal  The eventual end goal to go towards.
+     * @return A Queue telling directions in order.
      */
     public Queue<Vector2> findPath(Vector2 start, Vector2 goal) {
         if (start == null || goal == null) return new LinkedList<>();
@@ -75,14 +96,14 @@ public class PathFinder {
                     continue;
                 }
 
-                int tenativeGCost = currentNode.gCost + 1;
+                int tentativeGCost = currentNode.gCost + 1;
 
                 Node neighborNode = new Node(n);
-                neighborNode.gCost = tenativeGCost;
+                neighborNode.gCost = tentativeGCost;
                 neighborNode.hCost = (int) heuristic(n, goal);
                 neighborNode.parent = currentNode;
 
-                if (!openSet.contains(neighborNode) || tenativeGCost < neighborNode.gCost) {
+                if (!openSet.contains(neighborNode) || tentativeGCost < neighborNode.gCost) {
                     openSet.add(neighborNode);
                 }
             }
@@ -91,6 +112,12 @@ public class PathFinder {
         return null;
     }
 
+    /**
+     * Reconstructs the path from the end node to the start node.
+     *
+     * @param node The end node.
+     * @return A Queue representing the reconstructed path.
+     */
     private Queue<Vector2> reconstructPath(Node node) {
         Queue<Vector2> path = new LinkedList<>();
 
@@ -103,6 +130,12 @@ public class PathFinder {
         return path;
     }
 
+    /**
+     * Retrieves the neighboring positions of a given position.
+     *
+     * @param pos The current position.
+     * @return An ArrayList of neighboring positions.
+     */
     private ArrayList<Vector2> getNeighbors(Vector2 pos) {
         ArrayList<Vector2> neighbors = new ArrayList<>();
         for (int i = -1; i <= 1; i++) {
@@ -116,6 +149,13 @@ public class PathFinder {
         return neighbors;
     }
 
+    /**
+     * Calculates the heuristic distance between two positions.
+     *
+     * @param a The first position.
+     * @param b The second position.
+     * @return The heuristic distance between the two positions.
+     */
     private double heuristic(Vector2 a, Vector2 b) {
         return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
@@ -156,6 +196,11 @@ public class PathFinder {
         return j >= 0 && j < width;
     }
 
+    /**
+     * Returns a string representation of the map.
+     *
+     * @return The string representation of the map.
+     */
     public String toString() {
         StringBuilder s = new StringBuilder();
         for (char[] row : map) {

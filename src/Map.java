@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-
 /**
  * The Map class represents a grid-based structure used for mapping in the game.
  * It stores information about the layout of the game world, including characters at different positions.
@@ -9,6 +5,10 @@ import java.util.HashMap;
  * @author Aditya B, Ekam S
  * @version 4 December, 2023
  */
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Map {
     private char[][] grid;
