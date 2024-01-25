@@ -16,7 +16,6 @@ import java.util.Queue;
 
 public class Player extends Entity {
     private double deltaAnimate = 0;
-    private boolean blocked = false;
 
     public ArrayList<Vector2> visited;
 
@@ -28,7 +27,7 @@ public class Player extends Entity {
     public boolean dead = false;
     private boolean angry = false;
     private double angryTimer = 0f;
-    public final double TOTAL_ANGRY_TIME = 300f;
+    public final double TOTAL_ANGRY_TIME = 350f;
     /**
      * Constructor for the Player class with specified parameters.
      *
@@ -83,6 +82,14 @@ public class Player extends Entity {
         this.walls = walls;
     }
 
+    public Vector2 getMovingTowards() {
+        Vector2 g = getGridPos().gridPos.copy();
+        while (m.moveable(g)) {
+            g.add(getDirection().swap());
+        }
+        return g.add(getDirection().swap().multiply(-1));
+    }
+
     /**
      * Override of the draw method to render the player on the screen.
      *
@@ -99,6 +106,7 @@ public class Player extends Entity {
 //            );
 //        }
         drawImage(g);
+//        Vector2 m = this.m.getPoint(getMovingTowards());
     }
 
     /**
@@ -112,12 +120,28 @@ public class Player extends Entity {
         Vector2 p = getPos();
         Vector2 size = getSize();
 
-        BufferedImage[] frames = switch (Utils.getDirection(getDirection())) {
-            case 'n' -> upFrames;
-            case 's' -> downFrames;
-            case 'w' -> leftFrames;
-            default -> rightFrames;
-        };
+//        BufferedImage[] frames = switch (Utils.getDirection(getDirection())) {
+//            case 'n' -> upFrames;
+//            case 's' -> downFrames;
+//            case 'w' -> leftFrames;
+//            default -> rightFrames;
+//        };
+
+        BufferedImage[] frames;
+        switch (Utils.getDirection(getDirection())) {
+            case 'n':
+                frames = upFrames;
+                break;
+            case 's':
+                frames = downFrames;
+                break;
+            case 'w':
+                frames = leftFrames;
+                break;
+            default:
+                frames = rightFrames;
+                break;
+        }
 
         setImages(frames);
 
@@ -175,7 +199,7 @@ public class Player extends Entity {
         moveInDirection(deltaT);
 
         // animate every 5 (forgot units ms), and make sure it's not blocekd and moving
-        if (deltaAnimate >= 5 && !blocked) {
+        if (deltaAnimate >= 5 && !blocked && Utils.getDirection(getDirection()) != '0') {
             incrementFrameIndex();
             deltaAnimate = 0;
         }

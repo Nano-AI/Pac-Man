@@ -60,14 +60,15 @@ public class Food extends Entity {
     @Override
     public void update(double deltaT) {
         if (isTouching(player) && !eaten) {
-            getStatsCounter().addEaten();
             if (isFruit()) {
                 getAudioPlayer().playSound("gs_eatfruit");
                 player.setAngry();
                 for (Ghost g : getGhosts()) {
                     g.setMode(Ghost.Mode.SCARED);
                 }
+                getStatsCounter().addFruitEaten();
             } else {
+                getStatsCounter().addEaten();
                 getAudioPlayer().playSound("gs_chomp");
             }
             eaten = true;

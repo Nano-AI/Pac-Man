@@ -149,8 +149,22 @@ public class Window extends JFrame implements KeyListener {
         b.name = 'b';
         b.mapChar = 'b';
 
+        pixelSpot = map.getPoint((int) spawns.get(2).x, (int) spawns.get(2).y);
+        Ghost i = new Ghost("inky", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        i.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        i.name = 'i';
+        i.mapChar = 'i';
+
+        pixelSpot = map.getPoint((int) spawns.get(3).x, (int) spawns.get(3).y);
+        Ghost c = new Ghost("clyde", (int) pixelSpot.x, (int) pixelSpot.y, (int) spawns.get(0).x, (int) spawns.get(0).y, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        c.hitbox = new Rect(0, 0, pixelPerHorizontalGrid, pixelPerVerticalGrid);
+        c.name = 'c';
+        c.mapChar = 'c';
+
         ghosts.add(g);
         ghosts.add(b);
+        ghosts.add(i);
+        ghosts.add(c);
 
         for (Ghost gh : ghosts) {
             gh.setBlueGhost(blueGhosts);
@@ -322,7 +336,8 @@ public class Window extends JFrame implements KeyListener {
     private void updateFood(ArrayList<Entity> e) {
         int i = 0;
         while (i < e.size()) {
-            if (e.get(i) instanceof Food f) {
+            if (e.get(i) instanceof Food) {
+                Food f = (Food) e.get(i);
                 if (f.isEaten()) {
                     e.remove(i);
                     i--;
@@ -463,23 +478,73 @@ public class Window extends JFrame implements KeyListener {
 
     private static int getInd(String n) {
         int ind = -1;
+//        switch (n) {
+//            case " W W" -> ind = 0;
+//            case " WW " -> ind = 1;
+//            case "  WW" -> ind = 2;
+//            case "WW  " -> ind = 3;
+//            case "W  W" -> ind = 4;
+//            case "W W " -> ind = 5;
+//            case " WWW" -> ind = 6;
+//            case "W   " -> ind = 7;
+//            case " W  " -> ind = 8;
+//            case "  W " -> ind = 9;
+//            case "   W" -> ind = 10;
+//            case "    " -> ind = 11;
+//            case "WWW " -> ind = 12;
+//            case "W WW" -> ind = 13;
+//            case "WW W" -> ind = 14;
+//            case "WWWW" -> ind = 15;
+//        }
         switch (n) {
-            case " W W" -> ind = 0;
-            case " WW " -> ind = 1;
-            case "  WW" -> ind = 2;
-            case "WW  " -> ind = 3;
-            case "W  W" -> ind = 4;
-            case "W W " -> ind = 5;
-            case " WWW" -> ind = 6;
-            case "W   " -> ind = 7;
-            case " W  " -> ind = 8;
-            case "  W " -> ind = 9;
-            case "   W" -> ind = 10;
-            case "    " -> ind = 11;
-            case "WWW " -> ind = 12;
-            case "W WW" -> ind = 13;
-            case "WW W" -> ind = 14;
-            case "WWWW" -> ind = 15;
+            case " W W":
+                ind = 0;
+                break;
+            case " WW ":
+                ind = 1;
+                break;
+            case "  WW":
+                ind = 2;
+                break;
+            case "WW  ":
+                ind = 3;
+                break;
+            case "W  W":
+                ind = 4;
+                break;
+            case "W W ":
+                ind = 5;
+                break;
+            case " WWW":
+                ind = 6;
+                break;
+            case "W   ":
+                ind = 7;
+                break;
+            case " W  ":
+                ind = 8;
+                break;
+            case "  W ":
+                ind = 9;
+                break;
+            case "   W":
+                ind = 10;
+                break;
+            case "    ":
+                ind = 11;
+                break;
+            case "WWW ":
+                ind = 12;
+                break;
+            case "W WW":
+                ind = 13;
+                break;
+            case "WW W":
+                ind = 14;
+                break;
+            case "WWWW":
+                ind = 15;
+                break;
         }
         return ind;
     }
@@ -506,14 +571,37 @@ public class Window extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
+//        switch (key) {
+//            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> player.setWantedDirection('e');
+//            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> player.setWantedDirection('w');
+//            case KeyEvent.VK_UP , KeyEvent.VK_W-> player.setWantedDirection('n');
+//            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> player.setWantedDirection('s');
+//            case KeyEvent.VK_P -> System.out.println(map.toString());
+//            default -> {
+//            }
+//        }
         switch (key) {
-            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> player.setWantedDirection('e');
-            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> player.setWantedDirection('w');
-            case KeyEvent.VK_UP , KeyEvent.VK_W-> player.setWantedDirection('n');
-            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> player.setWantedDirection('s');
-            case KeyEvent.VK_P -> System.out.println(map.toString());
-            default -> {
-            }
+            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:
+                player.setWantedDirection('e');
+                break;
+            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_A:
+                player.setWantedDirection('w');
+                break;
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:
+                player.setWantedDirection('n');
+                break;
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:
+                player.setWantedDirection('s');
+                break;
+            case KeyEvent.VK_P:
+                System.out.println(map.toString());
+                break;
+            default:
+                // No need for breaks in this traditional switch statement
         }
     }
 

@@ -3,7 +3,11 @@
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$USER_HOME$/Downloads" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="openjdk-20" project-jdk-type="JavaSDK">
+=======
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="temurin-1.8" project-jdk-type="JavaSDK">
+>>>>>>> 585ad69fa5f1fbff6495c04edd2f32e5d09359fb
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

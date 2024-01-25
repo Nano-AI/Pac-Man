@@ -122,7 +122,9 @@ public class Vector2 {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Vector2 v)) return false;
+        if (!(o instanceof Vector2)) return false;
+//        if (!(o instanceof Vector2 v)) return false;
+        Vector2 v = (Vector2) o;
         return x == v.x && y == v.y;
     }
 
